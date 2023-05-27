@@ -46,6 +46,7 @@ func (h *CreateUserHandler) Handle(ctx context.Context, request events.APIGatewa
 }
 
 func StartCreateUserHandler(app *application.Application) {
-	handler := AuthHandler{app}
+	handler := CreateUserHandler{app}
+
 	lambda.Start(handler.Handle)
 }

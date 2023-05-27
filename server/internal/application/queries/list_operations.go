@@ -9,3 +9,7 @@ type ListOperationsQueryHandler struct{}
 func (h *ListOperationsQueryHandler) Execute(ctx context.Context, c *ListOperationsQuery) error {
 	return nil
 }
+
+func NewListOperationsQueryHandler() *ListOperationsQueryHandler {
+	return &ListOperationsQueryHandler{}
+}

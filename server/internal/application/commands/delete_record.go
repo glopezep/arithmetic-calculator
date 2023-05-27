@@ -6,16 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
-type DeleteOperationCommand struct {
+type DeleteRecordCommand struct {
 	ID uuid.UUID
 }
 
-type DeleteOperationCommandHandler struct{}
+type DeleteRecordCommandHandler struct{}
 
-func (h *DeleteOperationCommandHandler) Execute(ctx context.Context, c *DeleteOperationCommand) error {
+func (h *DeleteRecordCommandHandler) Execute(ctx context.Context, c *DeleteRecordCommand) error {
 	return nil
 }
 
-func NewDeleteOperationCommandHandler() *DeleteOperationCommandHandler {
-	return &DeleteOperationCommandHandler{}
+func NewDeleteRecordCommandHandler() *DeleteRecordCommandHandler {
+	return &DeleteRecordCommandHandler{}
 }

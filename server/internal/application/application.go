@@ -37,11 +37,13 @@ func NewApplication() (*Application, error) {
 	return &Application{
 		Commands: commands.Commands{
 			CreateUser:       *commands.NewCreateUserCommandHandler(userRepository),
-			DeleteRecord:     *commands.NewDeleteOperationCommandHandler(),
+			DeleteRecord:     *commands.NewDeleteRecordCommandHandler(),
 			ExecuteOperation: *commands.NewExecuteOperationCommandHandler(),
 		},
 		Queries: queries.Queries{
 			AuthenticateUser: *queries.NewAuthenticateUserQueryHandler(userRepository, tokenService),
+			ListOperations:   *queries.NewListOperationsQueryHandler(),
+			ListRecords:      *queries.NewListRecordsQueryHandler(),
 		},
 	}, nil
 }

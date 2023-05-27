@@ -7,33 +7,31 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
-	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
+	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/google/uuid"
 )
 
-type ExecuteOperationHandler struct {
+type ListRecordsHandler struct {
 	app *application.Application
 }
 
-type ExecuteOperationRequest struct {
+type ListRecordsRequest struct {
 	OperationID uuid.UUID
 }
 
-type ExecuteOperationResponse struct{}
+type ListRecordsResponse struct{}
 
-func (h *ExecuteOperationHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+func (h *ListRecordsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	ctx = context.WithValue(ctx, "authorization", request.Headers["authorization"])
 
-	var req ExecuteOperationRequest
+	var req ListRecordsRequest
 
 	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
 		return nil, err
 	}
 
-	err = h.app.Commands.ExecuteOperation.Execute(ctx, &commands.ExecuteOperationCommand{
-		OperationID: req.OperationID,
-	})
+	err = h.app.Queries.ListRecords.Execute(ctx, &queries.ListRecordsQuery{})
 
 	if err != nil {
 		return nil, err
@@ -44,8 +42,8 @@ func (h *ExecuteOperationHandler) Handle(ctx context.Context, request events.API
 	}, nil
 }
 
-func StartExecuteOperationHandler(app *application.Application) {
-	handler := ExecuteOperationHandler{app}
+func StartListRecordsHandler(app *application.Application) {
+	handler := ListRecordsHandler{app}
 
 	lambda.Start(handler.Handle)
 }

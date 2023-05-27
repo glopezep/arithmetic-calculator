@@ -2,6 +2,6 @@ package commands
 
 type Commands struct {
 	CreateUser       CreateUserCommandHandler
-	DeleteRecord     DeleteOperationCommandHandler
+	DeleteRecord     DeleteRecordCommandHandler
 	ExecuteOperation ExecuteOperationCommandHandler
 }

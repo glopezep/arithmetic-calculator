@@ -2,37 +2,48 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 
+	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
-	"github.com/google/uuid"
 	"github.com/stackus/errors"
 )
 
-type Event struct {
-	ID uuid.UUID `json:"id"`
+type DeleteRecordHandler struct {
+	app *application.Application
 }
 
-type Response struct {
-	ID uuid.UUID `json:"id"`
+type DeleteRecordRequest struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
-func DeleteRecordHandler(ctx context.Context, event Event) (*Response, error) {
-	app, err := application.NewApplication()
+type DeleteRecordResponse struct {
+	Token string `json:"token"`
+}
+
+func (h *DeleteRecordHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	var req DeleteRecordRequest
+
+	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize application")
+		return nil, errors.Wrap(err, "failed to unmarshal json")
 	}
 
-	cmd := &commands.DeleteOperationCommand{}
-
-	if err = app.Commands.DeleteRecord.Execute(ctx, cmd); err != nil {
-		return nil, errors.Wrap(err, "failed to delete the record")
+	err = h.app.Commands.DeleteRecord.Execute(ctx, &commands.DeleteRecordCommand{})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to create user")
 	}
 
-	return &Response{ID: event.ID}, nil
+	return &events.APIGatewayProxyResponse{
+		StatusCode: 200,
+	}, nil
 }
 
-func StartDeleteRecordHandler() {
-	lambda.Start(DeleteRecordHandler)
+func StartDeleteRecordHandler(app *application.Application) {
+	handler := DeleteRecordHandler{app}
+
+	lambda.Start(handler.Handle)
 }

@@ -19,5 +19,5 @@ func init() {
 }
 
 func main() {
-	handlers.StartDeleteRecordHandler(app)
+	handlers.StartListOperationsHandler(app)
 }
