@@ -2,7 +2,6 @@ package queries
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
@@ -22,11 +21,8 @@ type AuthenticateUserQueryHandler struct {
 func (h *AuthenticateUserQueryHandler) Execute(ctx context.Context, c *AuthenticateUserQuery) (string, error) {
 	u, err := h.user.FindByEmail(ctx, c.Email)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to authenticate user")
+		return "", err
 	}
-
-	fmt.Println(c.Password)
-	fmt.Println(u.Password.String())
 
 	if err = u.Password.Compare(c.Password); err != nil {
 		return "", errors.Wrap(err, "failed to authenticate user")

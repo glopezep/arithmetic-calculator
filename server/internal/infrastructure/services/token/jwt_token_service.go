@@ -1,8 +1,6 @@
 package token
 
 import (
-	"fmt"
-
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
@@ -27,18 +25,19 @@ func (s *jwtTokenService) Sign(userId uuid.UUID) (string, error) {
 	return token.SignedString(secret)
 }
 
-func (s *jwtTokenService) Verify(tokenStr string) {
+func (s *jwtTokenService) Verify(tokenStr string) (*Claims, error) {
 	secret := []byte(s.config.Secret)
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return secret, nil
 	})
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		fmt.Println(claims["foo"], claims["nbf"])
-	} else {
-		fmt.Println(err)
+	claims, ok := token.Claims.(Claims)
+	if !ok || !token.Valid {
+		return nil, err
 	}
+
+	return &claims, nil
 }
 
 func NewJwtTokenService() *jwtTokenService {

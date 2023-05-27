@@ -17,6 +17,7 @@ type Record struct {
 	OperationID       uuid.UUID
 	UserID            uuid.UUID
 	Amount            money.Money
+	UserBalance       money.Money
 	OperationResponse string
 	Date              time.Time
 }

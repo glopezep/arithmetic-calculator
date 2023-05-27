@@ -8,8 +8,11 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
-	"github.com/stackus/errors"
 )
+
+type AuthHandler struct {
+	app *application.Application
+}
 
 type AuthRequest struct {
 	Email    string `json:"email"`
@@ -20,26 +23,21 @@ type AuthResponse struct {
 	Token string `json:"token"`
 }
 
-func AuthHandler(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	app, err := application.NewApplication()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize app")
-	}
-
+func (h *AuthHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	var req AuthRequest
 
-	err = json.Unmarshal([]byte(request.Body), &req)
+	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal json")
+		return nil, err
 	}
 
-	token, err := app.Queries.AuthenticateUser.Execute(ctx, &queries.AuthenticateUserQuery{
+	token, err := h.app.Queries.AuthenticateUser.Execute(ctx, &queries.AuthenticateUserQuery{
 		Email:    req.Email,
 		Password: req.Password,
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to authenticate user")
+		return nil, err
 	}
 
 	bytes, err := json.Marshal(AuthResponse{
@@ -47,7 +45,7 @@ func AuthHandler(ctx context.Context, request events.APIGatewayProxyRequest) (*e
 	})
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to marshal json")
+		return nil, err
 	}
 
 	return &events.APIGatewayProxyResponse{
@@ -56,6 +54,8 @@ func AuthHandler(ctx context.Context, request events.APIGatewayProxyRequest) (*e
 	}, nil
 }
 
-func StartAuthHandler() {
-	lambda.Start(AuthHandler)
+func StartAuthHandler(app *application.Application) {
+	handler := AuthHandler{app}
+
+	lambda.Start(handler.Handle)
 }

@@ -2,44 +2,59 @@ package commands
 
 import (
 	"context"
+	"strings"
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
 	"github.com/google/uuid"
 	"github.com/stackus/errors"
 )
 
-type ExecuteOperationCommand struct{}
+type ExecuteOperationCommand struct {
+	OperationID uuid.UUID
+}
 
 type ExecuteOperationCommandHandler struct {
+	token     token.TokenService
 	user      repositories.UserRepository
 	operation repositories.OperationRepository
 	record    repositories.RecordRepository
 }
 
 func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *ExecuteOperationCommand) error {
-	userId := uuid.New()
-	operationId := uuid.New()
+	auth := ctx.Value("authorization").(string)
+	tokenString := strings.Split(auth, " ")[1]
+
+	claims, err := h.token.Verify(tokenString)
+	if err != nil {
+		return err
+	}
+
+	userId, err := uuid.FromBytes([]byte(claims.Issuer))
+	if err != nil {
+		return err
+	}
 
 	u, err := h.user.Find(ctx, userId)
 	if err != nil {
 		return errors.Wrap(err, "failed to find user")
 	}
 
-	o, err := h.operation.Find(ctx, operationId)
+	o, err := h.operation.Find(ctx, c.OperationID)
 	if err != nil {
-		return errors.Wrap(err, "failed to find operation")
+		return err
 	}
 
 	if err = u.ExecuteOperation(*o); err != nil {
-		return errors.Wrap(err, "failed to execute operation")
+		return err
 	}
 
 	if err = h.user.Update(ctx, u); err != nil {
-		return errors.Wrap(err, "failed to update user")
+		return err
 	}
 
-	r, err := entities.NewRecord(operationId, userId, o.Cost, "")
+	r, err := entities.NewRecord(c.OperationID, userId, o.Cost, "")
 	if err != nil {
 		return errors.Wrap(err, "failed to create record")
 	}

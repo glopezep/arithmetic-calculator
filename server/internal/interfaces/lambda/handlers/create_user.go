@@ -11,6 +11,10 @@ import (
 	"github.com/stackus/errors"
 )
 
+type CreateUserHandler struct {
+	app *application.Application
+}
+
 type CreateUserRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -20,20 +24,15 @@ type CreateUserResponse struct {
 	Token string `json:"token"`
 }
 
-func CreateUserHandler(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	app, err := application.NewApplication()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to initialize app")
-	}
-
+func (h *CreateUserHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	var req CreateUserRequest
 
-	err = json.Unmarshal([]byte(request.Body), &req)
+	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to unmarshal json")
 	}
 
-	err = app.Commands.CreateUser.Execute(ctx, &commands.CreateUserCommand{
+	err = h.app.Commands.CreateUser.Execute(ctx, &commands.CreateUserCommand{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -46,6 +45,7 @@ func CreateUserHandler(ctx context.Context, request events.APIGatewayProxyReques
 	}, nil
 }
 
-func StartCreateUserHandler() {
-	lambda.Start(CreateUserHandler)
+func StartCreateUserHandler(app *application.Application) {
+	handler := AuthHandler{app}
+	lambda.Start(handler.Handle)
 }

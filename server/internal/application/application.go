@@ -18,12 +18,8 @@ type Application struct {
 }
 
 func NewApplication() (*Application, error) {
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatal("Error loading .env file")
-	// }
-
 	database := db.NewDatabase()
+
 	gormDB, err := database.Open(os.Getenv("DB_SOURCE"))
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to connect to database")
