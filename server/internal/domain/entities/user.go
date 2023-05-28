@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"github.com/Rhymond/go-money"
+	"github.com/glopezep/arithmetic-calculator/internal/common"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/events"
 	valueobjects "github.com/glopezep/arithmetic-calculator/internal/domain/value_objects"
 	"github.com/google/uuid"
 )
@@ -15,6 +17,7 @@ var (
 )
 
 type User struct {
+	common.AggregateBase
 	ID       uuid.UUID
 	Email    valueobjects.Email
 	Password valueobjects.Password
@@ -39,6 +42,22 @@ func (u *User) ExecuteOperation(operation Operation) error {
 	}
 
 	u.Balance = *newBalance
+
+	switch operation.Type {
+	case valueobjects.OperationTypeDivision:
+		u.AddEvent(events.NewOperationDivided())
+	case valueobjects.OperationTypeMultiplication:
+		u.AddEvent(events.NewOperationMultiplied())
+	case valueobjects.OperationTypeRandomString:
+		u.AddEvent(events.NewOperationRandomStringGenerated())
+	case valueobjects.OperationTypeSquareRoot:
+		u.AddEvent(events.NewOperationSquareRooted())
+	case valueobjects.OperationTypeSubtraction:
+		u.AddEvent(events.NewOperationSubtracted())
+	case valueobjects.OperationTypeAddition:
+		u.AddEvent(events.NewOperationSummed())
+	default:
+	}
 
 	return nil
 }

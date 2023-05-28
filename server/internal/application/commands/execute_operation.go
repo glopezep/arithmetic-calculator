@@ -4,11 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
 	"github.com/google/uuid"
-	"github.com/stackus/errors"
 )
 
 type ExecuteOperationCommand struct {
@@ -16,10 +15,10 @@ type ExecuteOperationCommand struct {
 }
 
 type ExecuteOperationCommandHandler struct {
-	token     token.TokenService
-	user      repositories.UserRepository
-	operation repositories.OperationRepository
-	record    repositories.RecordRepository
+	token           token.TokenService
+	user            repositories.UserRepository
+	operation       repositories.OperationRepository
+	domainPublisher eventdispatcher.EventPublisher
 }
 
 func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *ExecuteOperationCommand) error {
@@ -38,7 +37,7 @@ func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *Execute
 
 	u, err := h.user.Find(ctx, userId)
 	if err != nil {
-		return errors.Wrap(err, "failed to find user")
+		return err
 	}
 
 	o, err := h.operation.Find(ctx, c.OperationID)
@@ -54,18 +53,21 @@ func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *Execute
 		return err
 	}
 
-	r, err := entities.NewRecord(c.OperationID, userId, o.Cost, "")
-	if err != nil {
-		return errors.Wrap(err, "failed to create record")
-	}
-
-	if err = h.record.Save(ctx, r); err != nil {
-		return errors.Wrap(err, "failed to save record")
-	}
+	h.domainPublisher.Publish(ctx, u.GetEvents()...)
 
 	return nil
 }
 
-func NewExecuteOperationCommandHandler() *ExecuteOperationCommandHandler {
-	return &ExecuteOperationCommandHandler{}
+func NewExecuteOperationCommandHandler(
+	token token.TokenService,
+	user repositories.UserRepository,
+	operation repositories.OperationRepository,
+	domainPublisher eventdispatcher.EventPublisher,
+) *ExecuteOperationCommandHandler {
+	return &ExecuteOperationCommandHandler{
+		token,
+		user,
+		operation,
+		domainPublisher,
+	}
 }

@@ -2,11 +2,16 @@ package eventhandlers
 
 import (
 	"context"
+	"math"
+	"strconv"
 
 	"github.com/glopezep/arithmetic-calculator/internal/common"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/events"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
+	randomstring "github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/random_string"
+	"github.com/google/uuid"
 )
 
 type OperationDomainEventHandlers interface {
@@ -19,37 +24,130 @@ type OperationDomainEventHandlers interface {
 }
 
 type OperationHandlers struct {
-	operationRepository repositories.OperationRepository
+	operation    repositories.OperationRepository
+	record       repositories.RecordRepository
+	randomString randomstring.RandomStringService
 }
 
 var _ OperationDomainEventHandlers = (*OperationHandlers)(nil)
 
-func NewOperationHandlers(operationRepository repositories.OperationRepository) *OperationHandlers {
+func NewOperationHandlers(
+	operation repositories.OperationRepository,
+	record repositories.RecordRepository,
+	randomString randomstring.RandomStringService,
+) *OperationHandlers {
 	return &OperationHandlers{
-		operationRepository,
+		operation,
+		record,
+		randomString,
 	}
 }
 
 func (h OperationHandlers) OnOperationDivided(ctx context.Context, event common.Event) error {
+	e := event.(*events.OperationDivided)
+	userId := uuid.New()
+	str := strconv.Itoa(int(e.FirstValue) / int(e.SecondValue))
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	err = h.record.Save(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (h OperationHandlers) OnOperationMultiplied(ctx context.Context, event common.Event) error {
+	e := event.(*events.OperationMultiplied)
+	userId := uuid.New()
+	str := strconv.Itoa(int(e.FirstValue) * int(e.SecondValue))
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	err = h.record.Save(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
+
 func (h OperationHandlers) OnOperationRandomStringGenerated(ctx context.Context, event common.Event) error {
+	e := event.(*events.OperationRandomStringGenerated)
+	userId := uuid.New()
+
+	str, err := h.randomString.Generate()
+	if err != nil {
+		return err
+	}
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	h.record.Save(ctx, r)
+
 	return nil
 }
 func (h OperationHandlers) OnOperationSquareRooted(ctx context.Context, event common.Event) error {
+	e := event.(*events.OperationSquareRooted)
+	userId := uuid.New()
+	str := strconv.Itoa(int(math.Sqrt(float64(e.FirstValue))))
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	err = h.record.Save(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
+
 func (h OperationHandlers) OnOperationSubtracted(ctx context.Context, event common.Event) error {
+	e := event.(*events.OperationSubtracted)
+	userId := uuid.New()
+	str := strconv.Itoa(int(e.FirstValue) - int(e.SecondValue))
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	err = h.record.Save(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (h OperationHandlers) OnOperationSummed(ctx context.Context, event common.Event) error {
-	// orderCreated := event.(*domain.OrderCreated)
-	// return h.notifications.NotifyOrderCreated(ctx, orderCreated.Order.ID, orderCreated.Order.CustomerID)
+	e := event.(*events.OperationSummed)
+	userId := uuid.New()
+	str := strconv.Itoa(int(e.FirstValue) + int(e.SecondValue))
+
+	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	if err != nil {
+		return err
+	}
+
+	err = h.record.Save(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

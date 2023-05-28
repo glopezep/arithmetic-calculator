@@ -6,6 +6,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db"
+	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/repositories/gorm"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
@@ -18,6 +19,7 @@ type Application struct {
 }
 
 func NewApplication() (*Application, error) {
+	domainDispatcher := eventdispatcher.NewEventDispatcher()
 
 	database := db.NewDatabase()
 
@@ -33,13 +35,19 @@ func NewApplication() (*Application, error) {
 
 	userMapper := mappers.NewUserMapper()
 	userRepository := gorm.NewGormUserRepository(gormDB, userMapper)
+	operationRepository := gorm.NewGormOperationRepository()
 	tokenService := token.NewJwtTokenService()
 
 	return &Application{
 		Commands: commands.Commands{
-			CreateUser:       *commands.NewCreateUserCommandHandler(userRepository),
-			DeleteRecord:     *commands.NewDeleteRecordCommandHandler(),
-			ExecuteOperation: *commands.NewExecuteOperationCommandHandler(),
+			CreateUser:   *commands.NewCreateUserCommandHandler(userRepository),
+			DeleteRecord: *commands.NewDeleteRecordCommandHandler(),
+			ExecuteOperation: *commands.NewExecuteOperationCommandHandler(
+				tokenService,
+				userRepository,
+				operationRepository,
+				domainDispatcher,
+			),
 		},
 		Queries: queries.Queries{
 			AuthenticateUser: *queries.NewAuthenticateUserQueryHandler(userRepository, tokenService),

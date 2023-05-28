@@ -23,7 +23,7 @@ type Operation struct {
 	Cost money.Money
 }
 
-func NewOperation(operationType valueobjects.OperationType, cost money.Money) (*Operation, error) {
+func NewOperation(operationType string, cost money.Money) (*Operation, error) {
 	if operationType == "" {
 		return nil, ErrOperationTypeIsBlank
 	}

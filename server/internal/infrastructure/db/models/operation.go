@@ -1,7 +1,13 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type Operation struct {
 	gorm.Model
+	ID   uuid.UUID
+	Type string
+	Cost int64
 }

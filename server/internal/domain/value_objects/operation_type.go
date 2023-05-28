@@ -21,12 +21,14 @@ func (vo OperationType) String() string {
 	return string(vo)
 }
 
-func NewOperationType(v OperationType) (*OperationType, error) {
-	if err := ValidateOperationType(v); err != nil {
+func NewOperationType(v string) (*OperationType, error) {
+	if err := ValidateOperationType(OperationType(v)); err != nil {
 		return nil, err
 	}
 
-	return &v, nil
+	o := OperationType(v)
+
+	return &o, nil
 }
 
 func ValidateOperationType(v OperationType) error {
