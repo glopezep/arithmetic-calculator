@@ -18,6 +18,7 @@ type Application struct {
 }
 
 func NewApplication() (*Application, error) {
+
 	database := db.NewDatabase()
 
 	gormDB, err := database.Open(os.Getenv("DB_SOURCE"))
