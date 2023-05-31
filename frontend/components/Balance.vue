@@ -1,15 +1,9 @@
 <script lang="ts" setup>
 interface Props {
-  amount: number;
+  balance: number;
 }
 
-const formatter = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
-
 const props = defineProps<Props>();
-const balance = computed(() => formatter.format(props.amount));
 </script>
 
 <template>

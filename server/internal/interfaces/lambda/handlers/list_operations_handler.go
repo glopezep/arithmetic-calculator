@@ -10,6 +10,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 )
 
 type ListOperationsHandler struct {
@@ -19,23 +20,27 @@ type ListOperationsHandler struct {
 type ListOperationsRequest struct{}
 
 type ListOperationsResponse struct {
-	Items []*entities.Operation `json:"items"`
+	*repositories.PaginatedResult[entities.Operation]
 }
 
 func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	offset, _ := strconv.Atoi(request.QueryStringParameters["offset"])
 	limit, _ := strconv.Atoi(request.QueryStringParameters["limit"])
+	sortBy := request.QueryStringParameters["sort_by"]
+	orderBy := request.QueryStringParameters["order_by"]
 
 	operations, err := h.app.Queries.ListOperations.Execute(ctx, &queries.ListOperationsQuery{
-		Offset: offset,
-		Limit:  limit,
+		Offset:  offset,
+		Limit:   limit,
+		SortBy:  sortBy,
+		OrderBy: orderBy,
 	})
 	if err != nil {
 		return nil, err
 	}
 
 	bytes, err := json.Marshal(ListOperationsResponse{
-		Items: operations,
+		PaginatedResult: operations,
 	})
 
 	if err != nil {

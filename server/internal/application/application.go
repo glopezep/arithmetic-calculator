@@ -60,6 +60,7 @@ func NewApplication() (*Application, error) {
 		},
 		Queries: queries.Queries{
 			AuthenticateUser: *queries.NewAuthenticateUserQueryHandler(userRepository, tokenService),
+			GetUserInfo:      *queries.NewGetUserInfoQueryHandler(tokenService, userRepository),
 			ListOperations:   *queries.NewListOperationsQueryHandler(operationRepository),
 			ListRecords:      *queries.NewListRecordsQueryHandler(recordRepository),
 		},

@@ -16,7 +16,7 @@ type ListOperationsQueryHandler struct {
 	operation repositories.OperationRepository
 }
 
-func (h *ListOperationsQueryHandler) Execute(ctx context.Context, q *ListOperationsQuery) ([]*entities.Operation, error) {
+func (h *ListOperationsQueryHandler) Execute(ctx context.Context, q *ListOperationsQuery) (*repositories.PaginatedResult[entities.Operation], error) {
 	return h.operation.FindAll(ctx, q.Offset, q.Limit, q.SortBy, q.OrderBy)
 }
 

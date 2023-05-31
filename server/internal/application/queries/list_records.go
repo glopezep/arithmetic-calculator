@@ -16,7 +16,7 @@ type ListRecordsQueryHandler struct {
 	record repositories.RecordRepository
 }
 
-func (h *ListRecordsQueryHandler) Execute(ctx context.Context, q *ListRecordsQuery) ([]*entities.Record, error) {
+func (h *ListRecordsQueryHandler) Execute(ctx context.Context, q *ListRecordsQuery) (*repositories.PaginatedResult[entities.Record], error) {
 	return h.record.FindAll(ctx, q.Offset, q.Limit, q.SortBy, q.OrderBy)
 }
 

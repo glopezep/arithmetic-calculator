@@ -4,10 +4,7 @@ interface Props {
 }
 
 defineProps<Props>();
-
-const emit = defineEmits<{
-  (e: "close", event: MouseEvent): void;
-}>();
+const emit = defineEmits(["close", "save"]);
 
 const basicOperations = [
   "addition",
@@ -35,10 +32,10 @@ watch(currentOperationId, (newValue) => {
   }
 });
 
-function createOperation() {
+async function createOperation() {
   const headers = useRequestHeaders(["cookie"]);
 
-  return $fetch("/api/operations", {
+  await $fetch("/api/operations", {
     method: "POST",
     headers,
     body: {
@@ -47,6 +44,8 @@ function createOperation() {
       secondValue: secondInput.value,
     },
   });
+
+  emit("save");
 }
 </script>
 
@@ -96,7 +95,7 @@ function createOperation() {
       </div>
 
       <div class="modal-action">
-        <button class="btn btn-ghost" @click="emit('close', $event)">
+        <button class="btn btn-ghost" @click="$emit('close', $event)">
           Cancel
         </button>
         <button class="btn btn-primary" @click="createOperation">Save</button>

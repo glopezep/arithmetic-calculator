@@ -1,9 +1,4 @@
-interface Record {
-  id: string;
-  amount: number;
-  userBalance: number;
-  operationResponse: string;
-}
+import { RecordItem } from "../..";
 
 interface ListRecordsRequest {
   limit?: number;
@@ -13,7 +8,11 @@ interface ListRecordsRequest {
 }
 
 interface ListRecordsResponse {
-  items: Record[];
+  items: RecordItem[];
+  totalCount: number;
+  offset: number;
+  limit: number;
+  hasNextPage: boolean;
 }
 
 class RecordService {

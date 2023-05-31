@@ -1,36 +1,32 @@
+<script lang="ts" setup>
+import { RecordItem } from "..";
+
+interface Props {
+  records: RecordItem[] | undefined;
+}
+
+defineProps<Props>();
+</script>
+
 <template>
   <div class="overflow-x-auto">
     <table class="table w-full">
-      <!-- head -->
       <thead>
         <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Job</th>
-          <th>Favorite Color</th>
+          <th>ID</th>
+          <th>Amount</th>
+          <th>User Balance</th>
+          <th>Operation Response</th>
+          <th>Created At</th>
         </tr>
       </thead>
       <tbody>
-        <!-- row 1 -->
-        <tr>
-          <th>1</th>
-          <td>Cy Ganderton</td>
-          <td>Quality Control Specialist</td>
-          <td>Blue</td>
-        </tr>
-        <!-- row 2 -->
-        <tr>
-          <th>2</th>
-          <td>Hart Hagerty</td>
-          <td>Desktop Support Technician</td>
-          <td>Purple</td>
-        </tr>
-        <!-- row 3 -->
-        <tr>
-          <th>3</th>
-          <td>Brice Swyre</td>
-          <td>Tax Accountant</td>
-          <td>Red</td>
+        <tr v-for="record in records">
+          <th>{{ record.id }}</th>
+          <td>{{ record.amount }}</td>
+          <td>{{ record.userBalance }}</td>
+          <td>{{ record.operationResponse }}</td>
+          <td>{{ record.createdAt }}</td>
         </tr>
       </tbody>
     </table>

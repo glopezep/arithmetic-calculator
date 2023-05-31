@@ -18,7 +18,7 @@ type Record struct {
 	Amount            int64     `json:"amount"`
 	UserBalance       int64     `json:"userBalance"`
 	OperationResponse string    `json:"operationResponse"`
-	Date              time.Time `json:"date"`
+	CreatedAt         time.Time `json:"createdAt"`
 }
 
 func NewRecord(
@@ -39,6 +39,6 @@ func NewRecord(
 		Amount:            amount,
 		UserBalance:       userBalance,
 		OperationResponse: operationResponse,
-		Date:              time.Now(),
+		CreatedAt:         time.Now(),
 	}, nil
 }

@@ -17,11 +17,10 @@ var (
 
 type User struct {
 	common.AggregateBase
-	ID       uuid.UUID
-	Email    valueobjects.Email
-	Password valueobjects.Password
-	Status   valueobjects.UserStatus
-	Balance  int64
+	Email    valueobjects.Email      `json:"email"`
+	Password valueobjects.Password   `json:"password"`
+	Status   valueobjects.UserStatus `json:"status"`
+	Balance  int64                   `json:"balance"`
 }
 
 func (u *User) ExecuteOperation(operation *Operation, fistValue, secondValue int64) error {
@@ -112,7 +111,9 @@ func NewUser(email, password string) (*User, error) {
 	}
 
 	return &User{
-		ID:       uuid.New(),
+		AggregateBase: common.AggregateBase{
+			ID: uuid.New(),
+		},
 		Email:    *e,
 		Password: *p,
 		Status:   valueobjects.UserStatusActive,

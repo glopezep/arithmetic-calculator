@@ -45,9 +45,14 @@ func (r *gormOperationRepository) Find(ctx context.Context, id uuid.UUID) (*enti
 func (r *gormOperationRepository) FindAll(ctx context.Context,
 	pageNumber, pageSize int,
 	sortBy, orderBy string,
-) ([]*entities.Operation, error) {
+) (*repositories.PaginatedResult[entities.Operation], error) {
 	var operations []models.Operation
 	var result []*entities.Operation
+	var count int64
+
+	r.db.
+		Model(&models.Operation{}).
+		Count(&count)
 
 	r.db.
 		Scopes(db.Order(sortBy, orderBy)).
@@ -63,12 +68,16 @@ func (r *gormOperationRepository) FindAll(ctx context.Context,
 		result = append(result, e)
 	}
 
-	return result, nil
+	return &repositories.PaginatedResult[entities.Operation]{
+		Items:       result,
+		TotalCount:  count,
+		Offset:      int64(pageNumber),
+		Limit:       int64(pageSize),
+		HasNextPage: pageNumber*pageSize < int(count),
+	}, nil
 }
 
 func (r *gormOperationRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	r.db.Delete(&models.Operation{}, "10")
-
 	return nil
 }
 

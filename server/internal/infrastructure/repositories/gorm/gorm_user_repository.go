@@ -69,7 +69,7 @@ func (r *gormUserRepository) FindByEmail(ctx context.Context, email string) (*en
 func (r *gormUserRepository) FindAll(ctx context.Context,
 	pageNumber, pageSize int,
 	sortBy, orderBy string,
-) ([]*entities.User, error) {
+) (*repositories.PaginatedResult[entities.User], error) {
 	var users []models.User
 
 	r.db.

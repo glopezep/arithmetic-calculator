@@ -1,8 +1,24 @@
 <script lang="ts" setup>
+const filters = reactive({
+  limit: 5,
+  offset: 1,
+  sort_by: "user_balance",
+  order_by: "desc",
+});
+
 const headers = useRequestHeaders(["cookie"]);
-const { data, error, pending } = useFetch("/api/me", { headers });
+const { data: userData, refresh } = useFetch("/api/me", { headers });
+const { data: records } = useFetch("/api/records", {
+  headers,
+  query: filters,
+});
 
 const isOperationModalShow = ref(false);
+
+async function handleSave() {
+  await refresh();
+  isOperationModalShow.value = false;
+}
 </script>
 
 <template>
@@ -16,16 +32,26 @@ const isOperationModalShow = ref(false);
         New operation
       </button>
     </div>
-    <Balance :amount="data?.balance!" />
+    <Balance :balance="userData?.balance!" />
 
     <article class="card mb-8">
-      <TableControl />
-      <RecordTable />
+      <TableControl
+        v-model:sort-by="filters.sort_by"
+        v-model:order-by="filters.order_by"
+      />
+      <RecordTable :records="records?.items" />
     </article>
-    <TablePagination />
+    <TablePagination
+      :has-next-page="records?.hasNextPage"
+      v-model:limit="filters.limit"
+      v-model:offset="filters.offset"
+      @update:limit="(limit) => (filters.limit = limit)"
+      @update:offset="(offset) => (filters.offset = offset)"
+    />
     <OperationModal
       :show="isOperationModalShow"
       @close="isOperationModalShow = false"
+      @save="handleSave"
     />
   </div>
 </template>

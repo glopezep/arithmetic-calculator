@@ -10,23 +10,25 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 )
 
 type ListRecordsHandler struct {
 	app *application.Application
 }
 
-type ListRecordsRequest struct{}
+type ListRecordsRequest struct {
+}
 
 type ListRecordsResponse struct {
-	Items []*entities.Record `json:"items"`
+	*repositories.PaginatedResult[entities.Record]
 }
 
 func (h *ListRecordsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	offset, _ := strconv.Atoi(request.QueryStringParameters["offset"])
 	limit, _ := strconv.Atoi(request.QueryStringParameters["limit"])
-	sortBy, _ := request.QueryStringParameters["sort_by"]
-	orderBy, _ := request.QueryStringParameters["order_by"]
+	sortBy := request.QueryStringParameters["sort_by"]
+	orderBy := request.QueryStringParameters["order_by"]
 
 	records, err := h.app.Queries.ListRecords.Execute(ctx, &queries.ListRecordsQuery{
 		Offset:  offset,
@@ -39,7 +41,7 @@ func (h *ListRecordsHandler) Handle(ctx context.Context, request events.APIGatew
 	}
 
 	bytes, err := json.Marshal(ListRecordsResponse{
-		Items: records,
+		PaginatedResult: records,
 	})
 
 	if err != nil {

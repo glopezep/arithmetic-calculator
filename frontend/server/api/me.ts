@@ -1,6 +1,9 @@
+import { userService } from "../services/user-service";
+
 export default defineEventHandler(async (event) => {
-  return {
-    token: event.context.session.user?.token,
-    balance: 89.4,
-  };
+  const token = event.context.session.user?.token;
+
+  return userService.me({
+    authorization: `Bearer ${token}`,
+  });
 });

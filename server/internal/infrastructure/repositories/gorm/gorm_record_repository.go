@@ -52,9 +52,14 @@ func (r *gormRecordRepository) FindAll(
 	ctx context.Context,
 	pageNumber, pageSize int,
 	sortBy, orderBy string,
-) ([]*entities.Record, error) {
+) (*repositories.PaginatedResult[entities.Record], error) {
 	var records []models.Record
 	var result []*entities.Record
+	var count int64
+
+	r.db.
+		Model(&models.Record{}).
+		Count(&count)
 
 	r.db.
 		Scopes(db.Order(sortBy, orderBy)).
@@ -70,7 +75,13 @@ func (r *gormRecordRepository) FindAll(
 		result = append(result, e)
 	}
 
-	return result, nil
+	return &repositories.PaginatedResult[entities.Record]{
+		Items:       result,
+		TotalCount:  count,
+		Offset:      int64(pageNumber),
+		Limit:       int64(pageSize),
+		HasNextPage: pageNumber*pageSize < int(count),
+	}, nil
 }
 
 func (r *gormRecordRepository) Delete(ctx context.Context, id uuid.UUID) error {

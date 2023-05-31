@@ -2,9 +2,11 @@ interface AuthenticateResponse {
   token: string;
 }
 
-interface CreateUserRequest {
+interface GetUserInfoResponse {
+  id: string;
   email: string;
-  password: string;
+  status: string;
+  balance: number;
 }
 
 class UserService {
@@ -44,6 +46,18 @@ class UserService {
     });
 
     return res as AuthenticateResponse;
+  }
+
+  async me(context: { authorization: string }): Promise<GetUserInfoResponse> {
+    const res = await $fetch("/user_info", {
+      baseURL: this.baseUrl,
+      method: "GET",
+      headers: {
+        authorization: context.authorization,
+      },
+    });
+
+    return res as GetUserInfoResponse;
   }
 }
 

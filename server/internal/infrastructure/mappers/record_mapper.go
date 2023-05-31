@@ -16,7 +16,7 @@ func (m *RecordMapper) ToEntity(model models.Record) (*entities.Record, error) {
 		Amount:            model.Amount,
 		UserBalance:       model.UserBalance,
 		OperationResponse: model.OperationResponse,
-		Date:              model.CreatedAt,
+		CreatedAt:         model.CreatedAt,
 	}, nil
 }
 

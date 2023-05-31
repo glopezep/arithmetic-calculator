@@ -13,3 +13,11 @@ declare module "iron-session" {
     };
   }
 }
+
+interface RecordItem {
+  id: string;
+  amount: number;
+  userBalance: number;
+  operationResponse: string;
+  createdAt: string;
+}
