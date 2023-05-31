@@ -3,7 +3,6 @@ package entities
 import (
 	"errors"
 
-	"github.com/Rhymond/go-money"
 	"github.com/glopezep/arithmetic-calculator/internal/common"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/events"
 	valueobjects "github.com/glopezep/arithmetic-calculator/internal/domain/value_objects"
@@ -22,40 +21,71 @@ type User struct {
 	Email    valueobjects.Email
 	Password valueobjects.Password
 	Status   valueobjects.UserStatus
-	Balance  money.Money
+	Balance  int64
 }
 
-func (u *User) ExecuteOperation(operation Operation) error {
-	ok, err := u.Balance.LessThan(&operation.Cost)
-
-	if err != nil {
-		return err
-	}
+func (u *User) ExecuteOperation(operation *Operation, fistValue, secondValue int64) error {
+	ok := u.Balance < operation.Cost
 
 	if ok {
 		return ErrBalanceInsufficient
 	}
 
-	newBalance, err := u.Balance.Subtract(&operation.Cost)
-	if err != nil {
-		return err
-	}
-
-	u.Balance = *newBalance
+	newBalance := u.Balance - operation.Cost
+	u.Balance = newBalance
 
 	switch operation.Type {
 	case valueobjects.OperationTypeDivision:
-		u.AddEvent(events.NewOperationDivided())
+		u.AddEvent(events.NewOperationDivided(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+			fistValue,
+			secondValue,
+		))
 	case valueobjects.OperationTypeMultiplication:
-		u.AddEvent(events.NewOperationMultiplied())
+		u.AddEvent(events.NewOperationMultiplied(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+			fistValue,
+			secondValue,
+		))
 	case valueobjects.OperationTypeRandomString:
-		u.AddEvent(events.NewOperationRandomStringGenerated())
+		u.AddEvent(events.NewOperationRandomStringGenerated(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+		))
 	case valueobjects.OperationTypeSquareRoot:
-		u.AddEvent(events.NewOperationSquareRooted())
+		u.AddEvent(events.NewOperationSquareRooted(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+			fistValue,
+		))
 	case valueobjects.OperationTypeSubtraction:
-		u.AddEvent(events.NewOperationSubtracted())
+		u.AddEvent(events.NewOperationSubtracted(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+			fistValue,
+			secondValue,
+		))
 	case valueobjects.OperationTypeAddition:
-		u.AddEvent(events.NewOperationSummed())
+		u.AddEvent(events.NewOperationSummed(
+			operation.ID,
+			u.ID,
+			operation.Cost,
+			newBalance,
+			fistValue,
+			secondValue,
+		))
 	default:
 	}
 
@@ -86,6 +116,6 @@ func NewUser(email, password string) (*User, error) {
 		Email:    *e,
 		Password: *p,
 		Status:   valueobjects.UserStatusActive,
-		Balance:  *money.New(100, "USD"),
+		Balance:  100,
 	}, nil
 }

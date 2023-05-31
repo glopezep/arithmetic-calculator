@@ -11,4 +11,5 @@ type User struct {
 	Email    string
 	Password string
 	Balance  int64
+	Records  []Record
 }

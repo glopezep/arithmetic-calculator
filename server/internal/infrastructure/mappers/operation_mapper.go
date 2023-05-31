@@ -1,8 +1,6 @@
 package mappers
 
 import (
-	"github.com/Rhymond/go-money"
-	"github.com/glopezep/arithmetic-calculator/internal/common"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	valueobjects "github.com/glopezep/arithmetic-calculator/internal/domain/value_objects"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
@@ -17,11 +15,9 @@ func (m *OperationMapper) ToEntity(model models.Operation) (*entities.Operation,
 	}
 
 	return &entities.Operation{
-		AggregateBase: common.AggregateBase{
-			ID: model.ID,
-		},
+		ID:   model.ID,
 		Type: *oType,
-		Cost: *money.New(model.Cost, "USD"),
+		Cost: model.Cost,
 	}, nil
 }
 

@@ -6,23 +6,32 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type gormRecordRepository struct {
-	db gorm.DB
+	db     *gorm.DB
+	mapper mappers.RecordMapper
 }
 
-func (r *gormRecordRepository) Save(ctx context.Context, u *entities.Record) error {
-	record := models.Record{}
+func (r *gormRecordRepository) Save(ctx context.Context, re *entities.Record) error {
+	record := models.Record{
+		ID:                re.ID,
+		OperationID:       re.OperationID,
+		UserID:            re.UserID,
+		Amount:            re.Amount,
+		UserBalance:       re.UserBalance,
+		OperationResponse: re.OperationResponse,
+	}
 
 	r.db.Create(&record)
 
 	return nil
 }
 
-func (r *gormRecordRepository) Update(ctx context.Context, u *entities.Record) error {
+func (r *gormRecordRepository) Update(ctx context.Context, re *entities.Record) error {
 	var record models.Record
 
 	r.db.Save(&record)
@@ -40,10 +49,20 @@ func (r *gormRecordRepository) Find(ctx context.Context, id uuid.UUID) (*entitie
 
 func (r *gormRecordRepository) FindAll(ctx context.Context) ([]*entities.Record, error) {
 	var records []models.Record
+	var result []*entities.Record
 
 	r.db.Find(&records)
 
-	return nil, nil
+	for _, v := range records {
+		e, err := r.mapper.ToEntity(v)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, e)
+	}
+
+	return result, nil
 }
 
 func (r *gormRecordRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -52,6 +71,9 @@ func (r *gormRecordRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func NewGormRecordRepository() repositories.RecordRepository {
-	return &gormRecordRepository{}
+func NewGormRecordRepository(db *gorm.DB, mapper mappers.RecordMapper) repositories.RecordRepository {
+	return &gormRecordRepository{
+		db,
+		mapper,
+	}
 }

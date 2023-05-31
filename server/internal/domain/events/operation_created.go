@@ -12,6 +12,8 @@ func (e *OperationCreated) String() string {
 	return "OperationCreated"
 }
 
-func NewOperationCreated() *OperationCreated {
-	return &OperationCreated{}
+func NewOperationCreated(id uuid.UUID) *OperationCreated {
+	return &OperationCreated{
+		ID: id,
+	}
 }

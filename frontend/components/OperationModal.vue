@@ -17,10 +17,16 @@ const basicOperations = [
 ];
 const firstInput = ref<number | undefined>(undefined);
 const secondInput = ref<number | undefined>(undefined);
-const operationType = ref<string>("addition");
+const currentOperationId = ref<string | undefined>(undefined);
 
-watch(operationType, (newValue) => {
-  if (!basicOperations.includes(newValue)) {
+const { data } = useFetch("/api/operations");
+
+const currentOperationType = computed(
+  () => data?.value?.items.find((i) => i?.id === currentOperationId.value)?.type
+);
+
+watch(currentOperationId, (newValue) => {
+  if (!basicOperations.includes(newValue!)) {
     secondInput.value = undefined;
   }
 
@@ -36,9 +42,9 @@ function createOperation() {
     method: "POST",
     headers,
     body: {
-      type: operationType.value,
-      firstInput: firstInput.value,
-      secondInput: secondInput.value,
+      id: currentOperationId.value,
+      firstValue: firstInput.value,
+      secondValue: secondInput.value,
     },
   });
 }
@@ -50,21 +56,15 @@ function createOperation() {
       <h3 class="font-bold text-lg py-4">New operation</h3>
       <select
         class="select select-bordered w-full mb-4"
-        v-model="operationType"
+        v-model="currentOperationId"
       >
-        <option value="addition">Addition</option>
-        <option value="subtraction">Subtraction</option>
-        <option value="multiplication">Multiplication</option>
-        <option value="division">Division</option>
-        <option value="square_root">Square root</option>
-        <option value="random_string">Random string</option>
+        <!-- <option :value="undefined">Select</option> -->
+        <option v-for="o in data?.items" :value="o.id">{{ o.type }}</option>
       </select>
       <div
         class="grid grid-cols-2 gap-4"
         v-if="
-          ['addition', 'subtraction', 'multiplication', 'division'].includes(
-            operationType
-          )
+          basicOperations.includes(currentOperationType!)
         "
       >
         <input
@@ -84,7 +84,7 @@ function createOperation() {
 
       <div
         class="grid grid-cols-2 gap-4"
-        v-if="['square_root'].includes(operationType)"
+        v-if="['square_root'].includes(currentOperationType!)"
       >
         <input
           type="number"

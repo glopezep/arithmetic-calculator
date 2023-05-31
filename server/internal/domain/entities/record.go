@@ -4,7 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
 )
 
@@ -13,19 +12,20 @@ var (
 )
 
 type Record struct {
-	ID                uuid.UUID
-	OperationID       uuid.UUID
-	UserID            uuid.UUID
-	Amount            money.Money
-	UserBalance       money.Money
-	OperationResponse string
-	Date              time.Time
+	ID                uuid.UUID `json:"id"`
+	OperationID       uuid.UUID `json:"operationId"`
+	UserID            uuid.UUID `json:"userId"`
+	Amount            int64     `json:"amount"`
+	UserBalance       int64     `json:"userBalance"`
+	OperationResponse string    `json:"operationResponse"`
+	Date              time.Time `json:"date"`
 }
 
 func NewRecord(
 	operationId,
 	userId uuid.UUID,
-	amount money.Money,
+	amount,
+	userBalance int64,
 	operationResponse string,
 ) (*Record, error) {
 	if operationResponse == "" {
@@ -37,6 +37,7 @@ func NewRecord(
 		OperationID:       operationId,
 		UserID:            userId,
 		Amount:            amount,
+		UserBalance:       userBalance,
 		OperationResponse: operationResponse,
 		Date:              time.Now(),
 	}, nil

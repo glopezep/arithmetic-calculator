@@ -3,10 +3,6 @@ package entities
 import (
 	"errors"
 
-	"github.com/Rhymond/go-money"
-	"github.com/glopezep/arithmetic-calculator/internal/common"
-
-	"github.com/glopezep/arithmetic-calculator/internal/domain/events"
 	valueobjects "github.com/glopezep/arithmetic-calculator/internal/domain/value_objects"
 	"github.com/google/uuid"
 )
@@ -18,17 +14,17 @@ var (
 )
 
 type Operation struct {
-	common.AggregateBase
-	Type valueobjects.OperationType
-	Cost money.Money
+	ID   uuid.UUID                  `json:"id"`
+	Type valueobjects.OperationType `json:"type"`
+	Cost int64                      `json:"cost"`
 }
 
-func NewOperation(operationType string, cost money.Money) (*Operation, error) {
+func NewOperation(operationType string, cost int64) (*Operation, error) {
 	if operationType == "" {
 		return nil, ErrOperationTypeIsBlank
 	}
 
-	if cost.Amount() < 0 {
+	if cost < 0 {
 		return nil, ErrOperationCostIsNegative
 	}
 
@@ -38,14 +34,10 @@ func NewOperation(operationType string, cost money.Money) (*Operation, error) {
 	}
 
 	o := &Operation{
-		AggregateBase: common.AggregateBase{
-			ID: uuid.New(),
-		},
+		ID:   uuid.New(),
 		Type: *oType,
 		Cost: cost,
 	}
-
-	o.AddEvent(events.NewOperationCreated())
 
 	return o, nil
 }

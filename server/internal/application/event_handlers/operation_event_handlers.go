@@ -11,7 +11,6 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	randomstring "github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/random_string"
-	"github.com/google/uuid"
 )
 
 type OperationDomainEventHandlers interface {
@@ -45,10 +44,9 @@ func NewOperationHandlers(
 
 func (h OperationHandlers) OnOperationDivided(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationDivided)
-	userId := uuid.New()
 	str := strconv.Itoa(int(e.FirstValue) / int(e.SecondValue))
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}
@@ -63,10 +61,9 @@ func (h OperationHandlers) OnOperationDivided(ctx context.Context, event common.
 
 func (h OperationHandlers) OnOperationMultiplied(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationMultiplied)
-	userId := uuid.New()
 	str := strconv.Itoa(int(e.FirstValue) * int(e.SecondValue))
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}
@@ -81,14 +78,13 @@ func (h OperationHandlers) OnOperationMultiplied(ctx context.Context, event comm
 
 func (h OperationHandlers) OnOperationRandomStringGenerated(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationRandomStringGenerated)
-	userId := uuid.New()
 
 	str, err := h.randomString.Generate()
 	if err != nil {
 		return err
 	}
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}
@@ -99,10 +95,9 @@ func (h OperationHandlers) OnOperationRandomStringGenerated(ctx context.Context,
 }
 func (h OperationHandlers) OnOperationSquareRooted(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationSquareRooted)
-	userId := uuid.New()
 	str := strconv.Itoa(int(math.Sqrt(float64(e.FirstValue))))
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}
@@ -117,10 +112,9 @@ func (h OperationHandlers) OnOperationSquareRooted(ctx context.Context, event co
 
 func (h OperationHandlers) OnOperationSubtracted(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationSubtracted)
-	userId := uuid.New()
 	str := strconv.Itoa(int(e.FirstValue) - int(e.SecondValue))
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}
@@ -135,10 +129,9 @@ func (h OperationHandlers) OnOperationSubtracted(ctx context.Context, event comm
 
 func (h OperationHandlers) OnOperationSummed(ctx context.Context, event common.Event) error {
 	e := event.(*events.OperationSummed)
-	userId := uuid.New()
 	str := strconv.Itoa(int(e.FirstValue) + int(e.SecondValue))
 
-	r, err := entities.NewRecord(e.ID, userId, e.Cost, str)
+	r, err := entities.NewRecord(e.ID, e.UserID, e.Cost, e.UserBalance, str)
 	if err != nil {
 		return err
 	}

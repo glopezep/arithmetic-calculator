@@ -8,30 +8,28 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
-	"github.com/google/uuid"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 )
 
 type ListOperationsHandler struct {
 	app *application.Application
 }
 
-type ListOperationsRequest struct {
-	OperationID uuid.UUID
+type ListOperationsRequest struct{}
+
+type ListOperationsResponse struct {
+	Items []*entities.Operation `json:"items"`
 }
 
-type ListOperationsResponse struct{}
-
 func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	ctx = context.WithValue(ctx, "authorization", request.Headers["authorization"])
-
-	var req ListOperationsRequest
-
-	err := json.Unmarshal([]byte(request.Body), &req)
+	operations, err := h.app.Queries.ListOperations.Execute(ctx, &queries.ListOperationsQuery{})
 	if err != nil {
 		return nil, err
 	}
 
-	err = h.app.Queries.ListOperations.Execute(ctx, &queries.ListOperationsQuery{})
+	bytes, err := json.Marshal(ListOperationsResponse{
+		Items: operations,
+	})
 
 	if err != nil {
 		return nil, err
@@ -39,6 +37,7 @@ func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGa
 
 	return &events.APIGatewayProxyResponse{
 		StatusCode: 200,
+		Body:       string(bytes),
 	}, nil
 }
 

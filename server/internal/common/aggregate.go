@@ -9,7 +9,7 @@ type Aggregate interface {
 }
 
 type AggregateBase struct {
-	ID     uuid.UUID
+	ID     uuid.UUID `json:"id"`
 	events []Event
 }
 

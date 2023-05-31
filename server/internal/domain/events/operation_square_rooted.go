@@ -1,21 +1,27 @@
 package events
 
 import (
-	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
 )
 
 type OperationSquareRooted struct {
 	ID          uuid.UUID
-	Cost        money.Money
+	UserID      uuid.UUID
+	Cost        int64
+	UserBalance int64
 	FirstValue  int64
-	SecondValue int64
 }
 
 func (e *OperationSquareRooted) String() string {
 	return "OperationSquareRooted"
 }
 
-func NewOperationSquareRooted() *OperationSquareRooted {
-	return &OperationSquareRooted{}
+func NewOperationSquareRooted(id, userId uuid.UUID, cost, userBalance, firstValue int64) *OperationSquareRooted {
+	return &OperationSquareRooted{
+		ID:          id,
+		UserID:      userId,
+		Cost:        cost,
+		FirstValue:  firstValue,
+		UserBalance: userBalance,
+	}
 }

@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
@@ -21,7 +22,7 @@ func (r *gormUserRepository) Save(ctx context.Context, u *entities.User) error {
 		ID:       u.ID,
 		Email:    u.Email.String(),
 		Password: u.Password.String(),
-		Balance:  u.Balance.Amount(),
+		Balance:  u.Balance,
 	}
 
 	r.db.Create(&user)
@@ -32,7 +33,16 @@ func (r *gormUserRepository) Save(ctx context.Context, u *entities.User) error {
 func (r *gormUserRepository) Update(ctx context.Context, u *entities.User) error {
 	var user models.User
 
+	fmt.Println("new balance")
+	fmt.Println(u.Balance)
+
+	r.db.First(&user, "id = ?", u.ID)
+
+	user.Balance = u.Balance
+
 	r.db.Save(&user)
+
+	// r.db.Model(&user).Updates(models.User{ID: u.ID, Balance: 0})
 
 	return nil
 }

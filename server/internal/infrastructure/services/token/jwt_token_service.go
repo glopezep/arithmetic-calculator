@@ -1,21 +1,18 @@
 package token
 
 import (
-	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
 
-type jwtTokenService struct {
-	config config.Config
-}
+type jwtTokenService struct{}
 
 type Claims struct {
 	jwt.RegisteredClaims
 }
 
 func (s *jwtTokenService) Sign(userId uuid.UUID) (string, error) {
-	secret := []byte(s.config.Secret)
+	secret := []byte("secret")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject: userId.String(),
@@ -26,18 +23,27 @@ func (s *jwtTokenService) Sign(userId uuid.UUID) (string, error) {
 }
 
 func (s *jwtTokenService) Verify(tokenStr string) (*Claims, error) {
-	secret := []byte(s.config.Secret)
+	secret := []byte("secret")
 
-	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	keyFunc := func(token *jwt.Token) (interface{}, error) {
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+		if !ok {
+			return nil, ErrInvalidToken
+		}
 		return secret, nil
-	})
-
-	claims, ok := token.Claims.(Claims)
-	if !ok || !token.Valid {
-		return nil, err
 	}
 
-	return &claims, nil
+	token, err := jwt.ParseWithClaims(tokenStr, &Claims{}, keyFunc)
+	if err != nil {
+		return nil, ErrInvalidToken
+	}
+
+	claims, ok := token.Claims.(*Claims)
+	if !ok || !token.Valid {
+		return nil, ErrInvalidToken
+	}
+
+	return claims, nil
 }
 
 func NewJwtTokenService() *jwtTokenService {

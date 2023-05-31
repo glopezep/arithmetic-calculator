@@ -6,44 +6,57 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type gormOperationRepository struct {
-	db gorm.DB
+	db     *gorm.DB
+	mapper mappers.OperationMapper
 }
 
 func (r *gormOperationRepository) Save(ctx context.Context, u *entities.Operation) error {
-	record := models.Operation{}
+	operation := models.Operation{}
 
-	r.db.Create(&record)
+	r.db.Create(&operation)
 
 	return nil
 }
 
 func (r *gormOperationRepository) Update(ctx context.Context, u *entities.Operation) error {
-	var record models.Operation
+	var operation models.Operation
 
-	r.db.Save(&record)
+	r.db.Save(&operation)
 
 	return nil
 }
 
 func (r *gormOperationRepository) Find(ctx context.Context, id uuid.UUID) (*entities.Operation, error) {
-	var record models.Operation
+	var operation models.Operation
 
-	r.db.First(&record, "id = ?", id)
+	r.db.First(&operation, "id = ?", id)
 
-	return nil, nil
+	return r.mapper.ToEntity(operation)
+
 }
 
 func (r *gormOperationRepository) FindAll(ctx context.Context) ([]*entities.Operation, error) {
-	var records []models.Operation
+	var operations []models.Operation
+	var result []*entities.Operation
 
-	r.db.Find(&records)
+	r.db.Find(&operations)
 
-	return nil, nil
+	for _, v := range operations {
+		e, err := r.mapper.ToEntity(v)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, e)
+	}
+
+	return result, nil
 }
 
 func (r *gormOperationRepository) Delete(ctx context.Context, id uuid.UUID) error {
@@ -52,6 +65,9 @@ func (r *gormOperationRepository) Delete(ctx context.Context, id uuid.UUID) erro
 	return nil
 }
 
-func NewGormOperationRepository() repositories.OperationRepository {
-	return &gormOperationRepository{}
+func NewGormOperationRepository(db *gorm.DB, mapper mappers.OperationMapper) repositories.OperationRepository {
+	return &gormOperationRepository{
+		db,
+		mapper,
+	}
 }

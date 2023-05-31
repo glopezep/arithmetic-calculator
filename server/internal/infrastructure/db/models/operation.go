@@ -7,7 +7,8 @@ import (
 
 type Operation struct {
 	gorm.Model
-	ID   uuid.UUID
-	Type string
-	Cost int64
+	ID      uuid.UUID
+	Type    string
+	Cost    int64
+	Records []Record
 }
