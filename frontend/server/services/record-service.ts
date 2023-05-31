@@ -5,7 +5,14 @@ interface Record {
   operationResponse: string;
 }
 
-interface ListOperationResponse {
+interface ListRecordsRequest {
+  limit?: number;
+  offset?: number;
+  sort_by?: number;
+  order_by?: number;
+}
+
+interface ListRecordsResponse {
   items: Record[];
 }
 
@@ -16,18 +23,22 @@ class RecordService {
     this.baseUrl = "http://localhost:3000";
   }
 
-  async listRecords(context: {
-    authorization: string;
-  }): Promise<ListOperationResponse> {
+  async listRecords(
+    request: ListRecordsRequest,
+    context: {
+      authorization: string;
+    }
+  ): Promise<ListRecordsResponse> {
     const res = await $fetch("/records", {
       baseURL: this.baseUrl,
+      query: request,
       method: "GET",
       headers: {
         authorization: context.authorization,
       },
     });
 
-    return res as ListOperationResponse;
+    return res as ListRecordsResponse;
   }
 }
 

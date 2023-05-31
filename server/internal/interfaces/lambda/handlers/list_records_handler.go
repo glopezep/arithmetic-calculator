@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -22,7 +23,17 @@ type ListRecordsResponse struct {
 }
 
 func (h *ListRecordsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	records, err := h.app.Queries.ListRecords.Execute(ctx, &queries.ListRecordsQuery{})
+	offset, _ := strconv.Atoi(request.QueryStringParameters["offset"])
+	limit, _ := strconv.Atoi(request.QueryStringParameters["limit"])
+	sortBy, _ := request.QueryStringParameters["sort_by"]
+	orderBy, _ := request.QueryStringParameters["order_by"]
+
+	records, err := h.app.Queries.ListRecords.Execute(ctx, &queries.ListRecordsQuery{
+		Offset:  offset,
+		Limit:   limit,
+		SortBy:  sortBy,
+		OrderBy: orderBy,
+	})
 	if err != nil {
 		return nil, err
 	}

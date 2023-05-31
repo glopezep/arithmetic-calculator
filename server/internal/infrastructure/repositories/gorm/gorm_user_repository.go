@@ -6,6 +6,7 @@ import (
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/google/uuid"
@@ -65,10 +66,16 @@ func (r *gormUserRepository) FindByEmail(ctx context.Context, email string) (*en
 	return r.userMapper.ToEntity(user), nil
 }
 
-func (r *gormUserRepository) FindAll(ctx context.Context) ([]*entities.User, error) {
+func (r *gormUserRepository) FindAll(ctx context.Context,
+	pageNumber, pageSize int,
+	sortBy, orderBy string,
+) ([]*entities.User, error) {
 	var users []models.User
 
-	r.db.Find(&users)
+	r.db.
+		Scopes(db.Order(sortBy, orderBy)).
+		Scopes(db.Paginate(pageNumber, pageSize)).
+		Find(&users)
 
 	return nil, nil
 }

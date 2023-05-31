@@ -7,14 +7,17 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 )
 
-type ListRecordsQuery struct{}
+type ListRecordsQuery struct {
+	Offset, Limit   int
+	SortBy, OrderBy string
+}
 
 type ListRecordsQueryHandler struct {
 	record repositories.RecordRepository
 }
 
-func (h *ListRecordsQueryHandler) Execute(ctx context.Context, c *ListRecordsQuery) ([]*entities.Record, error) {
-	return h.record.FindAll(ctx)
+func (h *ListRecordsQueryHandler) Execute(ctx context.Context, q *ListRecordsQuery) ([]*entities.Record, error) {
+	return h.record.FindAll(ctx, q.Offset, q.Limit, q.SortBy, q.OrderBy)
 }
 
 func NewListRecordsQueryHandler(record repositories.RecordRepository) *ListRecordsQueryHandler {

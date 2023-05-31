@@ -11,5 +11,5 @@ type Repository[T any] interface {
 	Update(ctx context.Context, t *T) error
 	Delete(ctx context.Context, id uuid.UUID) error
 	Find(ctx context.Context, id uuid.UUID) (*T, error)
-	FindAll(ctx context.Context) ([]*T, error)
+	FindAll(ctx context.Context, pageNumber, pageSize int, sortBy, orderBy string) ([]*T, error)
 }

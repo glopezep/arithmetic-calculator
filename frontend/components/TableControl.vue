@@ -1,11 +1,7 @@
 <template>
   <div class="flex justify-between items-center">
-    <input
-      type="text"
-      placeholder="Search"
-      class="input input-bordered w-full max-w-xs mb-4"
-    />
-    <div class="flex space-x-4">
+    <div class="w-full max-w-xs mb-4" />
+    <div class="flex space-x-4 mb-4">
       <div class="form-control">
         <div class="input-group">
           <span>

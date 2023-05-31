@@ -5,6 +5,7 @@ import (
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/google/uuid"
@@ -47,11 +48,18 @@ func (r *gormRecordRepository) Find(ctx context.Context, id uuid.UUID) (*entitie
 	return nil, nil
 }
 
-func (r *gormRecordRepository) FindAll(ctx context.Context) ([]*entities.Record, error) {
+func (r *gormRecordRepository) FindAll(
+	ctx context.Context,
+	pageNumber, pageSize int,
+	sortBy, orderBy string,
+) ([]*entities.Record, error) {
 	var records []models.Record
 	var result []*entities.Record
 
-	r.db.Find(&records)
+	r.db.
+		Scopes(db.Order(sortBy, orderBy)).
+		Scopes(db.Paginate(pageNumber, pageSize)).
+		Find(&records)
 
 	for _, v := range records {
 		e, err := r.mapper.ToEntity(v)
