@@ -27,7 +27,7 @@ func NewPassword(v string) (*Password, error) {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(v), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, ErrInvalidPassword
+		return nil, err
 	}
 
 	p := Password(string(hash))
@@ -36,5 +36,9 @@ func NewPassword(v string) (*Password, error) {
 }
 
 func validatePassword(v string) error {
+	if v == "" {
+		return ErrInvalidPassword
+	}
+
 	return nil
 }
