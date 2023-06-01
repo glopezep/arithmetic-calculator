@@ -22,6 +22,14 @@ async function handleSave() {
 
   isOperationModalShow.value = false;
 }
+
+async function handleDelete(id: string) {
+  await $fetch(`/api/records/${id}`, {
+    method: "DELETE",
+  });
+
+  await refreshRecords();
+}
 </script>
 
 <template>
@@ -42,7 +50,7 @@ async function handleSave() {
         v-model:sort-by="filters.sort_by"
         v-model:order-by="filters.order_by"
       />
-      <RecordTable :records="records?.items" />
+      <RecordTable :records="records?.items" @delete="handleDelete" />
     </article>
     <TablePagination
       :has-next-page="records?.hasNextPage"

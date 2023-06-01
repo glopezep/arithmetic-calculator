@@ -9,11 +9,11 @@ interface GetUserInfoResponse {
   balance: number;
 }
 
-class UserService {
+export class UserService {
   baseUrl: string;
 
-  constructor() {
-    this.baseUrl = "http://localhost:3000";
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
   }
 
   async authenticate(
@@ -61,4 +61,4 @@ class UserService {
   }
 }
 
-export const userService = new UserService();
+export const userService = new UserService(useRuntimeConfig().baseApiHost);

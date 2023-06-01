@@ -14,11 +14,11 @@ interface ListOperationResponse {
   items: Operation[];
 }
 
-class OperationService {
+export class OperationService {
   baseUrl: string;
 
-  constructor() {
-    this.baseUrl = "http://localhost:3000";
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
   }
 
   async executeOperation(
@@ -52,4 +52,6 @@ class OperationService {
   }
 }
 
-export const operationService = new OperationService();
+export const operationService = new OperationService(
+  useRuntimeConfig().baseApiHost
+);

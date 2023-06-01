@@ -12,4 +12,7 @@ export default defineNuxtConfig({
       secure: process.env.NODE_ENV === "production",
     },
   },
+  runtimeConfig: {
+    baseApiHost: process.env.API_HOST || "http://localhost:3000",
+  },
 });

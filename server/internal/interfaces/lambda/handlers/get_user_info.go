@@ -27,7 +27,7 @@ func (h *GetUserInfoHandler) Handle(ctx context.Context, request events.APIGatew
 	u, err := h.app.Queries.GetUserInfo.Execute(ctx, &queries.GetUserInfoQuery{})
 
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	bytes, err := json.Marshal(GetUserInfoResponse{
@@ -38,7 +38,7 @@ func (h *GetUserInfoHandler) Handle(ctx context.Context, request events.APIGatew
 	})
 
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	return &events.APIGatewayProxyResponse{

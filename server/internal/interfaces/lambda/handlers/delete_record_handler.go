@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
-	"github.com/stackus/errors"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
+	"github.com/google/uuid"
 )
 
 type DeleteRecordHandler struct {
@@ -16,25 +16,18 @@ type DeleteRecordHandler struct {
 }
 
 type DeleteRecordRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	ID string `json:"id"`
 }
 
-type DeleteRecordResponse struct {
-	Token string `json:"token"`
-}
+type DeleteRecordResponse struct{}
 
 func (h *DeleteRecordHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	var req DeleteRecordRequest
+	err := h.app.Commands.DeleteRecord.Execute(ctx, &commands.DeleteRecordCommand{
+		ID: uuid.MustParse(request.PathParameters["id"]),
+	})
 
-	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal json")
-	}
-
-	err = h.app.Commands.DeleteRecord.Execute(ctx, &commands.DeleteRecordCommand{})
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to create user")
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	return &events.APIGatewayProxyResponse{
@@ -45,5 +38,5 @@ func (h *DeleteRecordHandler) Handle(ctx context.Context, request events.APIGate
 func StartDeleteRecordHandler(app *application.Application) {
 	handler := DeleteRecordHandler{app}
 
-	lambda.Start(handler.Handle)
+	lambda.Start(helpers.HandleWithContext(handler.Handle))
 }

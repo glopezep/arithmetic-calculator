@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
-	"github.com/stackus/errors"
 )
 
 type CreateUserHandler struct {
@@ -29,7 +28,7 @@ func (h *CreateUserHandler) Handle(ctx context.Context, request events.APIGatewa
 
 	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to unmarshal json")
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	err = h.app.Commands.CreateUser.Execute(ctx, &commands.CreateUserCommand{
@@ -37,7 +36,8 @@ func (h *CreateUserHandler) Handle(ctx context.Context, request events.APIGatewa
 		Password: req.Password,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create user")
+		return &events.APIGatewayProxyResponse{}, err
+
 	}
 
 	return &events.APIGatewayProxyResponse{

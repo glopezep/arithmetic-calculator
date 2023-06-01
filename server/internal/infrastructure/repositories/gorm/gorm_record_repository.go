@@ -8,6 +8,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -43,9 +44,9 @@ func (r *gormRecordRepository) Update(ctx context.Context, re *entities.Record) 
 func (r *gormRecordRepository) Find(ctx context.Context, id uuid.UUID) (*entities.Record, error) {
 	var record models.Record
 
-	r.db.First(&record, "id = ?", id)
+	err := r.db.First(&record, "id = ?", id).Error
 
-	return nil, nil
+	return r.mapper.ToEntity(record), err
 }
 
 func (r *gormRecordRepository) FindAll(
@@ -53,6 +54,8 @@ func (r *gormRecordRepository) FindAll(
 	pageNumber, pageSize int,
 	sortBy, orderBy string,
 ) (*repositories.PaginatedResult[entities.Record], error) {
+	helperContext := ctx.Value(helpers.ContextKey("context")).(helpers.Context)
+
 	var records []models.Record
 	var result []*entities.Record
 	var count int64
@@ -64,15 +67,11 @@ func (r *gormRecordRepository) FindAll(
 	r.db.
 		Scopes(db.Order(sortBy, orderBy)).
 		Scopes(db.Paginate(pageNumber, pageSize)).
+		Where("user_id = ?", helperContext.UserID).
 		Find(&records)
 
 	for _, v := range records {
-		e, err := r.mapper.ToEntity(v)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, e)
+		result = append(result, r.mapper.ToEntity(v))
 	}
 
 	return &repositories.PaginatedResult[entities.Record]{
@@ -85,9 +84,7 @@ func (r *gormRecordRepository) FindAll(
 }
 
 func (r *gormRecordRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	r.db.Delete(&models.Record{}, "10")
-
-	return nil
+	return r.db.Delete(&models.Record{}, id).Error
 }
 
 func NewGormRecordRepository(db *gorm.DB, mapper mappers.RecordMapper) repositories.RecordRepository {

@@ -1,14 +1,19 @@
 package application
 
 import (
+	"os"
+
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
 	eventhandlers "github.com/glopezep/arithmetic-calculator/internal/application/event_handlers"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	gormRepositories "github.com/glopezep/arithmetic-calculator/internal/infrastructure/repositories/gorm"
 	randomstring "github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/random_string"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -18,11 +23,11 @@ type Application struct {
 }
 
 func NewApplication(conn *gorm.DB) (*Application, error) {
-	// conf := config.NewConfig()
+	conf := config.NewConfig()
 
-	// if conf.Environment == "development" {
-	// 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	// }
+	if conf.Environment == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
 
 	domainDispatcher := eventdispatcher.NewEventDispatcher()
 	userMapper := mappers.NewUserMapper()
@@ -40,7 +45,7 @@ func NewApplication(conn *gorm.DB) (*Application, error) {
 	return &Application{
 		Commands: commands.Commands{
 			CreateUser:   *commands.NewCreateUserCommandHandler(userRepository),
-			DeleteRecord: *commands.NewDeleteRecordCommandHandler(),
+			DeleteRecord: *commands.NewDeleteRecordCommandHandler(recordRepository),
 			ExecuteOperation: *commands.NewExecuteOperationCommandHandler(
 				tokenService,
 				userRepository,

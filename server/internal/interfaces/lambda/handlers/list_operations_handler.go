@@ -11,6 +11,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 )
 
 type ListOperationsHandler struct {
@@ -36,7 +37,7 @@ func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGa
 		OrderBy: orderBy,
 	})
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	bytes, err := json.Marshal(ListOperationsResponse{
@@ -44,7 +45,7 @@ func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGa
 	})
 
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	return &events.APIGatewayProxyResponse{
@@ -56,5 +57,5 @@ func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGa
 func StartListOperationsHandler(app *application.Application) {
 	handler := ListOperationsHandler{app}
 
-	lambda.Start(handler.Handle)
+	lambda.Start(helpers.HandleWithContext(handler.Handle))
 }

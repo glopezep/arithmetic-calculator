@@ -29,7 +29,8 @@ func (h *ExecuteOperationHandler) Handle(ctx context.Context, request events.API
 
 	err := json.Unmarshal([]byte(request.Body), &req)
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
+
 	}
 
 	err = h.app.Commands.ExecuteOperation.Execute(ctx, &commands.ExecuteOperationCommand{
@@ -39,7 +40,7 @@ func (h *ExecuteOperationHandler) Handle(ctx context.Context, request events.API
 	})
 
 	if err != nil {
-		return nil, err
+		return &events.APIGatewayProxyResponse{}, err
 	}
 
 	return &events.APIGatewayProxyResponse{

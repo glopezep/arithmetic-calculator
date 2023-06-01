@@ -25,16 +25,9 @@ type ExecuteOperationCommandHandler struct {
 }
 
 func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *ExecuteOperationCommand) error {
-	token := ctx.Value(helpers.ContextKey("token")).(string)
+	helperContext := ctx.Value(helpers.ContextKey("context")).(helpers.Context)
 
-	claims, err := h.token.Verify(token)
-	if err != nil {
-		return err
-	}
-
-	userId := uuid.MustParse(claims.RegisteredClaims.Subject)
-
-	u, err := h.user.Find(ctx, userId)
+	u, err := h.user.Find(ctx, helperContext.UserID)
 	if err != nil {
 		return err
 	}

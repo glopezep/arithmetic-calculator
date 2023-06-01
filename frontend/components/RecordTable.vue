@@ -6,6 +6,7 @@ interface Props {
 }
 
 defineProps<Props>();
+defineEmits(["delete"]);
 </script>
 
 <template>
@@ -18,6 +19,7 @@ defineProps<Props>();
           <th>User Balance</th>
           <th>Operation Response</th>
           <th>Created At</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +29,14 @@ defineProps<Props>();
           <td>{{ record.userBalance }}</td>
           <td>{{ record.operationResponse }}</td>
           <td>{{ record.createdAt }}</td>
+          <td>
+            <button
+              class="btn btn-error btn-sm"
+              @click="$emit('delete', record.id)"
+            >
+              Delete
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>

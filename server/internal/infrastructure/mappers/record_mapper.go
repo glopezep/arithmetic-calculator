@@ -7,8 +7,7 @@ import (
 
 type RecordMapper struct{}
 
-func (m *RecordMapper) ToEntity(model models.Record) (*entities.Record, error) {
-
+func (m *RecordMapper) ToEntity(model models.Record) *entities.Record {
 	return &entities.Record{
 		ID:                model.ID,
 		OperationID:       model.OperationID,
@@ -17,7 +16,7 @@ func (m *RecordMapper) ToEntity(model models.Record) (*entities.Record, error) {
 		UserBalance:       model.UserBalance,
 		OperationResponse: model.OperationResponse,
 		CreatedAt:         model.CreatedAt,
-	}, nil
+	}
 }
 
 func NewRecordMapper() RecordMapper {
