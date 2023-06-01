@@ -2,7 +2,7 @@ package gorm
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
@@ -13,9 +13,13 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	ErrNotFound = errors.New("record not found")
+)
+
 type gormUserRepository struct {
-	db         *gorm.DB
-	userMapper mappers.UserMapper
+	db     *gorm.DB
+	mapper mappers.UserMapper
 }
 
 func (r *gormUserRepository) Save(ctx context.Context, u *entities.User) error {
@@ -34,16 +38,11 @@ func (r *gormUserRepository) Save(ctx context.Context, u *entities.User) error {
 func (r *gormUserRepository) Update(ctx context.Context, u *entities.User) error {
 	var user models.User
 
-	fmt.Println("new balance")
-	fmt.Println(u.Balance)
-
 	r.db.First(&user, "id = ?", u.ID)
 
 	user.Balance = u.Balance
 
 	r.db.Save(&user)
-
-	// r.db.Model(&user).Updates(models.User{ID: u.ID, Balance: 0})
 
 	return nil
 }
@@ -51,9 +50,17 @@ func (r *gormUserRepository) Update(ctx context.Context, u *entities.User) error
 func (r *gormUserRepository) Find(ctx context.Context, id uuid.UUID) (*entities.User, error) {
 	var user models.User
 
-	r.db.First(&user, "id = ?", id)
+	err := r.db.First(&user, "id = ?", id).Error
 
-	return r.userMapper.ToEntity(user), nil
+	if err != nil {
+		// if errors.As(err, gorm.ErrRecordNotFound.Error()) {
+		// 	return nil, ErrNotFound
+		// }
+
+		return nil, err
+	}
+
+	return r.mapper.ToEntity(user), err
 }
 
 func (r *gormUserRepository) FindByEmail(ctx context.Context, email string) (*entities.User, error) {
@@ -63,7 +70,7 @@ func (r *gormUserRepository) FindByEmail(ctx context.Context, email string) (*en
 		return nil, err
 	}
 
-	return r.userMapper.ToEntity(user), nil
+	return r.mapper.ToEntity(user), nil
 }
 
 func (r *gormUserRepository) FindAll(ctx context.Context,
@@ -71,13 +78,24 @@ func (r *gormUserRepository) FindAll(ctx context.Context,
 	sortBy, orderBy string,
 ) (*repositories.PaginatedResult[entities.User], error) {
 	var users []models.User
+	var result []*entities.User
 
 	r.db.
 		Scopes(db.Order(sortBy, orderBy)).
 		Scopes(db.Paginate(pageNumber, pageSize)).
 		Find(&users)
 
-	return nil, nil
+	for _, v := range users {
+		result = append(result, r.mapper.ToEntity(v))
+	}
+
+	return &repositories.PaginatedResult[entities.User]{
+		Items:       result,
+		TotalCount:  0,
+		Offset:      int64(pageNumber),
+		Limit:       int64(pageSize),
+		HasNextPage: false,
+	}, nil
 }
 
 func (r *gormUserRepository) Delete(ctx context.Context, id uuid.UUID) error {

@@ -22,7 +22,7 @@ createmigration:
 	migrate create -ext sql -dir internal/infrastructure/db/migrations -seq action_name -database "$(DB_URL)" -verbose down
 
 test:
-	go test ./... --cover
+	go test ./... --cover -v
 
 
 .PHONY: build, dev, createdb, dropdb, migrateup, migratedown, createmigration, test

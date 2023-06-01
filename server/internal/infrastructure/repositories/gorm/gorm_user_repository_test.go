@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db/models"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -20,31 +22,87 @@ func TestGormUserRepositoryFind(t *testing.T) {
 	mapper := mappers.NewUserMapper()
 	repository := NewGormUserRepository(gormDB, mapper)
 
-	var (
-		id    = uuid.New()
-		email = "test@test.com"
-	)
+	u, _ := entities.NewUser("test@test.com", "1234")
 
-	sqlMock.ExpectQuery(regexp.QuoteMeta(
-		`SELECT * FROM "users" WHERE (id = $1) LIMIT 1`)).
-		WithArgs(id.String()).
-		WillReturnRows(sqlmock.NewRows([]string{"id", "email"}).
-			AddRow(id.String(), email))
+	um := &models.User{
+		ID:       u.ID,
+		Email:    u.Email.String(),
+		Password: u.Password.String(),
+		Balance:  u.Balance,
+	}
 
-	_, err := repository.Find(context.Background(), id)
+	sql := `SELECT * FROM "users" WHERE id = $1 AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1`
+
+	rows := sqlmock.
+		NewRows([]string{"id", "email", "password", "balance", "created_at"}).
+		AddRow(um.ID, um.Email, um.Password, u.Balance, um.CreatedAt)
+
+	sqlMock.
+		ExpectQuery(regexp.QuoteMeta(sql)).
+		WithArgs(u.ID.String()).
+		WillReturnRows(rows)
+
+	uFromDB, err := repository.Find(context.Background(), u.ID)
 
 	require.NoError(t, err)
+	require.Equal(t, u, uFromDB)
 }
 
-func TestGormUserRepositoryFindAll(t *testing.T) {
+func TestGormUserRepositoryFindByEmail(t *testing.T) {
 	mapper := mappers.NewUserMapper()
 	repository := NewGormUserRepository(gormDB, mapper)
 
-	const sqlSelectAll = `SELECT * FROM "users" WHERE "users"."deleted_at" IS NULL ORDER BY created_at desc LIMIT 10"`
+	u, _ := entities.NewUser("test@test.com", "1234")
 
-	sqlMock.ExpectQuery(sqlSelectAll).WillReturnRows(sqlmock.NewRows(nil))
+	um := &models.User{
+		ID:       u.ID,
+		Email:    u.Email.String(),
+		Password: u.Password.String(),
+		Balance:  u.Balance,
+	}
 
-	_, err := repository.FindAll(context.Background(), 1, 10, "created_at", "desc")
+	sql := `SELECT * FROM "users" WHERE email = $1 AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1`
+
+	rows := sqlmock.
+		NewRows([]string{"id", "email", "password", "balance", "created_at"}).
+		AddRow(um.ID, um.Email, um.Password, u.Balance, um.CreatedAt)
+
+	sqlMock.
+		ExpectQuery(regexp.QuoteMeta(sql)).
+		WithArgs(u.Email.String()).
+		WillReturnRows(rows)
+
+	uFromDB, err := repository.FindByEmail(context.Background(), u.Email.String())
 
 	require.NoError(t, err)
+	require.Equal(t, u, uFromDB)
+}
+
+func TestGormUserRepositoryFindNotFound(t *testing.T) {
+	mapper := mappers.NewUserMapper()
+	repository := NewGormUserRepository(gormDB, mapper)
+
+	u, _ := entities.NewUser("test@test.com", "1234")
+
+	um := &models.User{
+		ID:       u.ID,
+		Email:    u.Email.String(),
+		Password: u.Password.String(),
+		Balance:  u.Balance,
+	}
+
+	sql := `SELECT * FROM "users" WHERE id = $1 AND "users"."deleted_at" IS NULL ORDER BY "users"."id" LIMIT 1`
+
+	rows := sqlmock.
+		NewRows([]string{"id", "email", "password", "balance", "created_at"}).
+		AddRow(um.ID, um.Email, um.Password, u.Balance, um.CreatedAt)
+
+	sqlMock.
+		ExpectQuery(regexp.QuoteMeta(sql)).
+		WithArgs(u.ID.String()).
+		WillReturnRows(rows)
+
+	_, err := repository.Find(context.Background(), uuid.New())
+
+	require.Error(t, err)
 }

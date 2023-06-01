@@ -16,9 +16,6 @@ func Order(sortBy, orderBy string) func(db *gorm.DB) *gorm.DB {
 			orderBy = "desc"
 		}
 
-		fmt.Println("format:")
-		fmt.Printf("%v %v", sortBy, orderBy)
-
 		return db.Order(fmt.Sprintf("%v %v", sortBy, orderBy))
 	}
 }
