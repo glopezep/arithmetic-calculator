@@ -21,6 +21,6 @@ func AutoMigrate(db *gorm.DB) error {
 	)
 }
 
-func NewDatabase() Database {
+func NewGormDatabase() Database {
 	return Database{}
 }

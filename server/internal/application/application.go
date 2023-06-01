@@ -1,20 +1,15 @@
 package application
 
 import (
-	"os"
-
 	"github.com/glopezep/arithmetic-calculator/internal/application/commands"
 	eventhandlers "github.com/glopezep/arithmetic-calculator/internal/application/event_handlers"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
-	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
-	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/db"
 	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/mappers"
-	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/repositories/gorm"
+	gormRepositories "github.com/glopezep/arithmetic-calculator/internal/infrastructure/repositories/gorm"
 	randomstring "github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/random_string"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 )
 
 type Application struct {
@@ -22,27 +17,20 @@ type Application struct {
 	Queries  queries.Queries
 }
 
-func NewApplication() (*Application, error) {
-	conf := config.NewConfig()
+func NewApplication(conn *gorm.DB) (*Application, error) {
+	// conf := config.NewConfig()
 
-	if conf.Environment == "development" {
-		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
-	}
+	// if conf.Environment == "development" {
+	// 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	// }
 
 	domainDispatcher := eventdispatcher.NewEventDispatcher()
-	database := db.NewDatabase()
-
-	gormDB, err := database.Open(conf.DBSource)
-	if err != nil {
-		log.Fatal().Err(err).Msg("cannot connect to db")
-	}
-
 	userMapper := mappers.NewUserMapper()
 	operationMapper := mappers.NewOperationMapper()
 	recordMapper := mappers.NewRecordMapper()
-	userRepository := gorm.NewGormUserRepository(gormDB, userMapper)
-	operationRepository := gorm.NewGormOperationRepository(gormDB, operationMapper)
-	recordRepository := gorm.NewGormRecordRepository(gormDB, recordMapper)
+	userRepository := gormRepositories.NewGormUserRepository(conn, userMapper)
+	operationRepository := gormRepositories.NewGormOperationRepository(conn, operationMapper)
+	recordRepository := gormRepositories.NewGormRecordRepository(conn, recordMapper)
 	tokenService := token.NewJwtTokenService()
 	randomStringService := randomstring.NewRandomStringService()
 	operationHandlers := eventhandlers.NewOperationHandlers(operationRepository, recordRepository, randomStringService)

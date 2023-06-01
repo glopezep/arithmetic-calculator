@@ -47,7 +47,7 @@ func (h *AuthHandler) Handle(ctx context.Context, request events.APIGatewayProxy
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 403,
 			Body:       string(lambdaError.MarshalJSON()),
-		}, nil
+		}, err
 	}
 
 	bytes, err := json.Marshal(AuthResponse{
@@ -64,7 +64,7 @@ func (h *AuthHandler) Handle(ctx context.Context, request events.APIGatewayProxy
 		return &events.APIGatewayProxyResponse{
 			StatusCode: 403,
 			Body:       string(lambdaError.MarshalJSON()),
-		}, nil
+		}, err
 	}
 
 	return &events.APIGatewayProxyResponse{
