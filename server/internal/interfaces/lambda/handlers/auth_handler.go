@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 )
 
 type AuthHandler struct {
@@ -37,7 +38,16 @@ func (h *AuthHandler) Handle(ctx context.Context, request events.APIGatewayProxy
 	})
 
 	if err != nil {
-		return nil, err
+		lambdaError := helpers.LambdaError{
+			Code:        "403",
+			Message:     "invalid credentials",
+			Description: err,
+		}
+
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 403,
+			Body:       string(lambdaError.MarshalJSON()),
+		}, nil
 	}
 
 	bytes, err := json.Marshal(AuthResponse{
@@ -45,7 +55,16 @@ func (h *AuthHandler) Handle(ctx context.Context, request events.APIGatewayProxy
 	})
 
 	if err != nil {
-		return nil, err
+		lambdaError := helpers.LambdaError{
+			Code:        "500",
+			Message:     "failed to marshal response",
+			Description: err,
+		}
+
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 403,
+			Body:       string(lambdaError.MarshalJSON()),
+		}, nil
 	}
 
 	return &events.APIGatewayProxyResponse{

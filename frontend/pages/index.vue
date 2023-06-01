@@ -1,14 +1,16 @@
 <script lang="ts" setup>
 const filters = reactive({
-  limit: 5,
+  limit: 10,
   offset: 1,
   sort_by: "user_balance",
   order_by: "desc",
 });
 
 const headers = useRequestHeaders(["cookie"]);
-const { data: userData, refresh } = useFetch("/api/me", { headers });
-const { data: records } = useFetch("/api/records", {
+const { data: userData, refresh: refreshUser } = useFetch("/api/me", {
+  headers,
+});
+const { data: records, refresh: refreshRecords } = useFetch("/api/records", {
   headers,
   query: filters,
 });
@@ -16,7 +18,8 @@ const { data: records } = useFetch("/api/records", {
 const isOperationModalShow = ref(false);
 
 async function handleSave() {
-  await refresh();
+  await Promise.all([refreshUser(), refreshRecords()]);
+
   isOperationModalShow.value = false;
 }
 </script>

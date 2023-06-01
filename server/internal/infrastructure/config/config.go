@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"os"
 )
 
 type Config struct {
@@ -10,17 +10,10 @@ type Config struct {
 	Secret      string `mapstructure:"SECRET"`
 }
 
-func LoadConfig(path string) (config Config, err error) {
-	viper.SetConfigName("local")
-	viper.SetConfigType("env")
-	viper.AddConfigPath(path)
-	viper.AutomaticEnv()
-
-	if err = viper.ReadInConfig(); err != nil {
-		return
+func NewConfig() Config {
+	return Config{
+		DBSource:    os.Getenv("DB_SOURCE"),
+		Environment: os.Getenv("ENVIRONMENT"),
+		Secret:      os.Getenv("SECRET"),
 	}
-
-	err = viper.Unmarshal(&config)
-
-	return
 }

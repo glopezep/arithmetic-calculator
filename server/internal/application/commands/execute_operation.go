@@ -6,7 +6,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	eventdispatcher "github.com/glopezep/arithmetic-calculator/internal/infrastructure/event_dispatcher"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
-	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/utils"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 	"github.com/google/uuid"
 )
 
@@ -25,7 +25,7 @@ type ExecuteOperationCommandHandler struct {
 }
 
 func (h *ExecuteOperationCommandHandler) Execute(ctx context.Context, c *ExecuteOperationCommand) error {
-	token := ctx.Value(utils.ContextKey("token")).(string)
+	token := ctx.Value(helpers.ContextKey("token")).(string)
 
 	claims, err := h.token.Verify(token)
 	if err != nil {

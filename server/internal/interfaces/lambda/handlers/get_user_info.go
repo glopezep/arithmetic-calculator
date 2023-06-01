@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
-	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/utils"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 	"github.com/google/uuid"
 )
 
@@ -50,5 +50,5 @@ func (h *GetUserInfoHandler) Handle(ctx context.Context, request events.APIGatew
 func StartGetUserInfoHandler(app *application.Application) {
 	handler := GetUserInfoHandler{app}
 
-	lambda.Start(utils.HandleWithContext(handler.Handle))
+	lambda.Start(helpers.HandleWithContext(handler.Handle))
 }

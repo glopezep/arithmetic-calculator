@@ -14,7 +14,7 @@ func (vo Email) String() string {
 
 func NewEmail(v string) (*Email, error) {
 	if err := validateEmail(v); err != nil {
-		return nil, err
+		return nil, ErrInvalidEmail
 	}
 
 	vo := Email(v)

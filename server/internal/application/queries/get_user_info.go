@@ -6,7 +6,7 @@ import (
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/services/token"
-	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/utils"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 	"github.com/google/uuid"
 )
 
@@ -19,7 +19,7 @@ type GetUserInfoQueryHandler struct {
 }
 
 func (h *GetUserInfoQueryHandler) Execute(ctx context.Context, q *GetUserInfoQuery) (*entities.User, error) {
-	token := ctx.Value(utils.ContextKey("token")).(string)
+	token := ctx.Value(helpers.ContextKey("token")).(string)
 
 	claims, err := h.token.Verify(token)
 	if err != nil {
