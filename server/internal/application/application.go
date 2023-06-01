@@ -37,7 +37,7 @@ func NewApplication(conn *gorm.DB) (*Application, error) {
 	operationRepository := gormRepositories.NewGormOperationRepository(conn, operationMapper)
 	recordRepository := gormRepositories.NewGormRecordRepository(conn, recordMapper)
 	tokenService := token.NewJwtTokenService()
-	randomStringService := randomstring.NewRandomStringService()
+	randomStringService := randomstring.NewRandomStringService(conf)
 	operationHandlers := eventhandlers.NewOperationHandlers(operationRepository, recordRepository, randomStringService)
 
 	eventhandlers.RegisterOperationHandlers(*operationHandlers, domainDispatcher)

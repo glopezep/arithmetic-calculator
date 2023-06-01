@@ -3,15 +3,21 @@ package randomstring
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 )
 
 type RandomStringService interface {
 	Generate() (string, error)
 }
 
-type randomStringService struct{}
+type randomStringService struct {
+	config *config.Config
+}
 
 type request struct {
 	JsonRPC string         `json:"jsonrpc"`
@@ -40,7 +46,6 @@ type response struct {
 }
 
 func (s *randomStringService) Generate() (string, error) {
-
 	req := request{
 		JsonRPC: "2.0",
 		Method:  "generateStrings",
@@ -57,12 +62,17 @@ func (s *randomStringService) Generate() (string, error) {
 	postBody, _ := json.Marshal(req)
 
 	resp, err := http.Post(
-		"https://api.random.org/json-rpc/4/invoke",
+		s.config.RandomServiceURL,
 		"application/json",
 		bytes.NewBuffer(postBody),
 	)
+
 	if err != nil {
-		return "", nil
+		return "", err
+	}
+
+	if resp.StatusCode != 200 {
+		return "", errors.New("failed to generate random string")
 	}
 
 	defer resp.Body.Close()
@@ -76,9 +86,15 @@ func (s *randomStringService) Generate() (string, error) {
 
 	json.Unmarshal([]byte(body), &res)
 
+	fmt.Println("resp:")
+	fmt.Print(err)
+	fmt.Print(res)
+
 	return res.Result.Random.Data[0], nil
 }
 
-func NewRandomStringService() RandomStringService {
-	return &randomStringService{}
+func NewRandomStringService(conf *config.Config) RandomStringService {
+	return &randomStringService{
+		config: conf,
+	}
 }
