@@ -7,7 +7,7 @@
 ![Diagram](https://raw.githubusercontent.com/glopezep/arithmetic-calculator/main/diagram.png)
 
 ## How to run
- The project is monorepo so you'll have to go to the specific of guides
+ The project is monorepo, you'll have to go to the specific guides
 
  * [Frontend](https://github.com/glopezep/arithmetic-calculator/tree/main/frontend)
  * [Server](https://github.com/glopezep/arithmetic-calculator/tree/main/server)
