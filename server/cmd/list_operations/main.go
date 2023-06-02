@@ -1,9 +1,14 @@
 package main
 
 import (
+	"context"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/handlers"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -27,6 +32,10 @@ func init() {
 	app = a
 }
 
+func handler(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	return handlers.ListOperationsHandler(ctx, request, app)
+}
+
 func main() {
-	handlers.StartListOperationsHandler(app)
+	lambda.Start(helpers.HandleWithContext(handler))
 }
