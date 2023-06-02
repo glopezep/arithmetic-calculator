@@ -7,7 +7,16 @@ jobs:
   deploy:
     strategy:
       matrix:
-        lambda: [auth, create_user, delete_record, execute_operation, get_user_info, list_operations, list_records]
+        lambda:
+          [
+            auth,
+            create_user,
+            delete_record,
+            execute_operation,
+            get_user_info,
+            list_operations,
+            list_records,
+          ]
     runs-on: ubuntu-latest
     steps:
       - name: checkout source code
@@ -29,14 +38,14 @@ jobs:
       #     name: lambda-package
       #     path: main
       - name: Deploy to Lambda
-        uses: appleboy/lambda-action@v2
+        uses: appleboy/lambda-action@v0.1.9
         with:
           aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
           function_name: ${{ matrix.lambda }}
           # function_handler: ${{ matrix.lambda }}
-          zip_file: server/${{ matrix.lambda }}.zip          
+          zip_file: server/${{ matrix.lambda }}.zip
           iam_role: arn:aws:iam::732945408435:role/service-role/auth-role-pi327j8y
           dry_run: true
           runtime: go1.x
