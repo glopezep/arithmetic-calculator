@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+definePageMeta({
+  middleware: ["auth"],
+});
+
 const filters = reactive({
   limit: 10,
   offset: 1,
