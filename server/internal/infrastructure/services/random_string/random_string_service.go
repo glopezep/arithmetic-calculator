@@ -6,9 +6,9 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
-	"github.com/rs/zerolog/log"
 )
 
 type RandomStringService interface {
@@ -50,7 +50,7 @@ func (s *randomStringService) Generate() (string, error) {
 		JsonRPC: "2.0",
 		Method:  "generateStrings",
 		Params: map[string]any{
-			"apiKey":      s.config.RandomServiceApiKey,
+			"apiKey":      os.Getenv("RANDOM_STRING_SERVICE_API_KEY"),
 			"n":           2,
 			"length":      10,
 			"characters":  "abcdefghijklmnopqrstuvwxyz",
@@ -61,16 +61,11 @@ func (s *randomStringService) Generate() (string, error) {
 
 	postBody, _ := json.Marshal(req)
 
-	log.Info().Msgf("%v", s.config)
-
 	resp, err := http.Post(
-		s.config.RandomServiceURL,
+		os.Getenv("RANDOM_STRING_SERVICE_URL"),
 		"application/json",
 		bytes.NewBuffer(postBody),
 	)
-
-	log.Error().Msg(err.Error())
-	log.Info().Msgf("%v", resp)
 
 	if err != nil {
 		return "", err
