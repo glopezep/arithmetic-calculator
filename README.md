@@ -1,6 +1,6 @@
 # arithmetic-calculator
-## Demo link [Here!!](https://arithmetic-calculator-orcin.vercel.app/)
 
+[arithmetic-calculator-orcin.vercel.app](arithmetic-calculator-orcin.vercel.app)
 
 ## Infrastructure
 
