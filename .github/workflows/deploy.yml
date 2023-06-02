@@ -44,7 +44,7 @@ jobs:
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_region: us-east-1
           function_name: ${{ matrix.lambda }}
-          # function_handler: ${{ matrix.lambda }}
+          function_handler: ${{ matrix.lambda }}
           zip_file: server/${{ matrix.lambda }}.zip
           iam_role: arn:aws:iam::732945408435:role/service-role/auth-role-pi327j8y
           dry_run: true
