@@ -45,4 +45,4 @@ jobs:
           iam_role: arn:aws:iam::732945408435:role/service-role/auth-role-pi327j8y
           runtime: go1.x
           memory_size: 128
-          environment: DB_SOURCE=postgresql://postgres:arithmetic@arithmetic.cxvu8glh50sg.us-east-1.rds.amazonaws.com:5432/arithmetic,SECRET=supersecret,RANDOM_STRING_SERVICE_URL=https://api.random.org/json-rpc/4/invoke,RANDOM_STRING_SERVICE_API_KEY=ffcfa8ec-f661-44cf-86fc-1f08925f5880
+          environment: DB_SOURCE=${{ secrets.DB_SOURCE }},SECRET=${{ secrets.SECRET }},RANDOM_STRING_SERVICE_URL=https://api.random.org/json-rpc/4/invoke,RANDOM_STRING_SERVICE_API_KEY=ffcfa8ec-f661-44cf-86fc-1f08925f5880
