@@ -6,7 +6,6 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
 )
@@ -50,7 +49,7 @@ func (s *randomStringService) Generate() (string, error) {
 		JsonRPC: "2.0",
 		Method:  "generateStrings",
 		Params: map[string]any{
-			"apiKey":      os.Getenv("RANDOM_STRING_SERVICE_API_KEY"),
+			"apiKey":      s.config.RandomServiceApiKey,
 			"n":           2,
 			"length":      10,
 			"characters":  "abcdefghijklmnopqrstuvwxyz",
@@ -62,7 +61,7 @@ func (s *randomStringService) Generate() (string, error) {
 	postBody, _ := json.Marshal(req)
 
 	resp, err := http.Post(
-		os.Getenv("RANDOM_STRING_SERVICE_URL"),
+		s.config.RandomServiceURL,
 		"application/json",
 		bytes.NewBuffer(postBody),
 	)
