@@ -49,7 +49,7 @@ export class UserService {
   }
 
   async me(context: { authorization: string }): Promise<GetUserInfoResponse> {
-    const res = await $fetch("/user_info", {
+    const res = await $fetch("/user-info", {
       baseURL: this.baseUrl,
       method: "GET",
       headers: {

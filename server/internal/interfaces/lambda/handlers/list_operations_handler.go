@@ -6,11 +6,17 @@ import (
 	"strconv"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/glopezep/arithmetic-calculator/internal/application"
 	"github.com/glopezep/arithmetic-calculator/internal/application/queries"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/entities"
 	"github.com/glopezep/arithmetic-calculator/internal/domain/repositories"
+	"github.com/glopezep/arithmetic-calculator/internal/interfaces/lambda/helpers"
 )
+
+type ListOperationsHandler struct {
+	app *application.Application
+}
 
 type ListOperationsRequest struct{}
 
@@ -18,13 +24,13 @@ type ListOperationsResponse struct {
 	*repositories.PaginatedResult[entities.Operation]
 }
 
-func ListOperationsHandler(ctx context.Context, request events.APIGatewayProxyRequest, app *application.Application) (*events.APIGatewayProxyResponse, error) {
+func (h *ListOperationsHandler) Handle(ctx context.Context, request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	offset, _ := strconv.Atoi(request.QueryStringParameters["offset"])
 	limit, _ := strconv.Atoi(request.QueryStringParameters["limit"])
 	sortBy := request.QueryStringParameters["sort_by"]
 	orderBy := request.QueryStringParameters["order_by"]
 
-	operations, err := app.Queries.ListOperations.Execute(ctx, &queries.ListOperationsQuery{
+	operations, err := h.app.Queries.ListOperations.Execute(ctx, &queries.ListOperationsQuery{
 		Offset:  offset,
 		Limit:   limit,
 		SortBy:  sortBy,
@@ -46,4 +52,10 @@ func ListOperationsHandler(ctx context.Context, request events.APIGatewayProxyRe
 		StatusCode: 200,
 		Body:       string(bytes),
 	}, nil
+}
+
+func StartListOperationsHandler(app *application.Application) {
+	handler := ListOperationsHandler{app}
+
+	lambda.Start(helpers.HandleWithContext(handler.Handle))
 }
