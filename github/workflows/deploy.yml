@@ -1,0 +1,43 @@
+name: Deploy Lambda Function
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    strategy:
+      matrix:
+        lambda: [auth, create_user, delete_record, execute_operation, get_user_info, list_operations, list_records]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout source code
+        uses: actions/checkout@v3
+
+      - name: Install Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: "1.20.x" # Specify the Go version you need
+
+      - name: Build Lambda function
+        # run: go build -o main'
+        run: |
+          cd server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o main cmd/${{ matrix.lambda }}/main.go && zip ${{ matrix.lambda }}.zip ${{ matrix.lambda }}
+
+      # - name: Archive Lambda function
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: lambda-package
+      #     path: main
+      - name: Deploy to Lambda
+        uses: appleboy/lambda-action@v2
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: us-east-1
+          function_name: ${{ matrix.lambda }}
+          # function_handler: ${{ matrix.lambda }}
+          zip_file: server/${{ matrix.lambda }}.zip          
+          iam_role: arn:aws:iam::732945408435:role/service-role/auth-role-pi327j8y
+          dry_run: true
+          runtime: go1.x
+          environment: DB_SOURCE=postgresql://arithmetic:arithmetic@arithmetic.cxvu8glh50sg.us-east-1.rds.amazonaws.com:5432/arithmetic?sslmode=disable,SECRET=supersecret,RANDOM_STRING_SERVICE_URL=https://api.random.org/json-rpc/4/invoke

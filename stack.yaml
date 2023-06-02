@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Lambda function with cfn-response.
+Resources:
+  Function:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: go1.x
+      Role: arn:aws:iam::123456789012:role/lambda-role
+      Handler: auth
+      Code:
+        ZipFile: |
+          package main
+          import (
+            "github.com/aws/aws-lambda-go/events"
+            "github.com/aws/aws-lambda-go/lambda"
+          )
+
+          func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+            return events.APIGatewayProxyResponse{
+              Body:       "hello world",
+              StatusCode: 200,
+            }, nil
+          }
+
+          func main() {
+            lambda.Start(handler)
+          }
+      Description: Invoke a function during stack creation.
+      TracingConfig:
+        Mode: Active

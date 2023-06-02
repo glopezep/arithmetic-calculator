@@ -1,6 +1,8 @@
 package token
 
 import (
+	"os"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
@@ -12,7 +14,7 @@ type Claims struct {
 }
 
 func (s *jwtTokenService) Sign(userId uuid.UUID) (string, error) {
-	secret := []byte("secret")
+	secret := []byte(os.Getenv("SECRET"))
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject: userId.String(),
@@ -23,7 +25,7 @@ func (s *jwtTokenService) Sign(userId uuid.UUID) (string, error) {
 }
 
 func (s *jwtTokenService) Verify(tokenStr string) (*Claims, error) {
-	secret := []byte("secret")
+	secret := []byte(os.Getenv("SECRET"))
 
 	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
