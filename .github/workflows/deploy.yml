@@ -30,7 +30,7 @@ jobs:
       - name: Build Lambda function
         # run: go build -o main'
         run: |
-          cd server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o main cmd/${{ matrix.lambda }}/main.go && zip ${{ matrix.lambda }}.zip ${{ matrix.lambda }}
+          cd server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o main cmd/${{ matrix.lambda }}/main.go && zip ${{ matrix.lambda }}.zip main
 
       # - name: Archive Lambda function
       #   uses: actions/upload-artifact@v2
