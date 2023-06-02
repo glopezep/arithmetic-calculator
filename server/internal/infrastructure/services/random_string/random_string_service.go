@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/glopezep/arithmetic-calculator/internal/infrastructure/config"
+	"github.com/rs/zerolog/log"
 )
 
 type RandomStringService interface {
@@ -60,11 +61,16 @@ func (s *randomStringService) Generate() (string, error) {
 
 	postBody, _ := json.Marshal(req)
 
+	log.Info().Msgf("%v", s.config)
+
 	resp, err := http.Post(
 		s.config.RandomServiceURL,
 		"application/json",
 		bytes.NewBuffer(postBody),
 	)
+
+	log.Error().Msg(err.Error())
+	log.Info().Msgf("%v", resp)
 
 	if err != nil {
 		return "", err
