@@ -1,6 +1,12 @@
 import { RecordItem } from "../..";
 import { Context } from "./context";
 
+interface ExecuteOperationRequest {
+  id: string;
+  firstValue: number;
+  secondValue: number;
+}
+
 interface ListRecordsRequest {
   limit?: number;
   offset?: number;
@@ -21,6 +27,22 @@ export class RecordService {
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+  }
+
+  async executeOperation(
+    operation: ExecuteOperationRequest,
+    context: { authorization: string }
+  ): Promise<any> {
+    const res = await $fetch("/records", {
+      baseURL: this.baseUrl,
+      method: "POST",
+      body: operation,
+      headers: {
+        authorization: context.authorization,
+      },
+    });
+
+    return res as any;
   }
 
   async listRecords(

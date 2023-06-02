@@ -13,8 +13,8 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    baseApiHost:
-      process.env.API_HOST ||
-      "https://l5b2uptpi5.execute-api.us-east-1.amazonaws.com/v1",
+    baseApiHost: process.env.API_HOST || "http://localhost:3000",
   },
 });
+
+// "https://l5b2uptpi5.execute-api.us-east-1.amazonaws.com/v1",

@@ -31,7 +31,8 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   CreateUserFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -51,7 +52,8 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   DeleteRecordFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -71,7 +73,8 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   ExecuteOperationFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -91,7 +94,8 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   GetUserInfoFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -104,14 +108,15 @@ Resources:
         CatchAll:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            Path: /user_info
+            Path: /user-info
             Method: GET
       Environment: # More info about Env Vars: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#environment-object
         Variables:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   ListOperationsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -131,7 +136,8 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke"
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880
   ListRecordsFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
@@ -151,5 +157,5 @@ Resources:
           DB_SOURCE: postgresql://test:test@host.docker.internal:5432/test?sslmode=disable
           SECRET: supersecret
           ENVIRONMENT: development
-          RANDOM_STRING_SERVICE_URL: "https://api.random.org/json-rpc/4/invoke"
-  
+          RANDOM_STRING_SERVICE_URL: https://api.random.org/json-rpc/4/invoke
+          RANDOM_STRING_SERVICE_API_KEY: ffcfa8ec-f661-44cf-86fc-1f08925f5880

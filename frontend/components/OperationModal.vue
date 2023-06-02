@@ -35,7 +35,7 @@ watch(currentOperationId, (newValue) => {
 async function createOperation() {
   const headers = useRequestHeaders(["cookie"]);
 
-  await $fetch("/api/operations", {
+  await $fetch("/api/records", {
     method: "POST",
     headers,
     body: {

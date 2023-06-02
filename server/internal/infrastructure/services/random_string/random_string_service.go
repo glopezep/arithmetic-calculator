@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -50,7 +49,7 @@ func (s *randomStringService) Generate() (string, error) {
 		JsonRPC: "2.0",
 		Method:  "generateStrings",
 		Params: map[string]any{
-			"apiKey":      "ffcfa8ec-f661-44cf-86fc-1f08925f5880",
+			"apiKey":      s.config.RandomServiceApiKey,
 			"n":           2,
 			"length":      10,
 			"characters":  "abcdefghijklmnopqrstuvwxyz",
@@ -79,16 +78,12 @@ func (s *randomStringService) Generate() (string, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	var res response
 
 	json.Unmarshal([]byte(body), &res)
-
-	fmt.Println("resp:")
-	fmt.Print(err)
-	fmt.Print(res)
 
 	return res.Result.Random.Data[0], nil
 }

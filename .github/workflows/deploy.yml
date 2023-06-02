@@ -32,11 +32,6 @@ jobs:
         run: |
           cd server && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -a -o main cmd/${{ matrix.lambda }}/main.go && zip ${{ matrix.lambda }}.zip main
 
-      # - name: Archive Lambda function
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: lambda-package
-      #     path: main
       - name: Deploy to Lambda
         uses: appleboy/lambda-action@v0.1.9
         with:
@@ -49,4 +44,5 @@ jobs:
           zip_file: server/${{ matrix.lambda }}.zip
           iam_role: arn:aws:iam::732945408435:role/service-role/auth-role-pi327j8y
           runtime: go1.x
-          environment: DB_SOURCE=postgresql://postgres:arithmetic@arithmetic.cxvu8glh50sg.us-east-1.rds.amazonaws.com:5432/arithmetic,SECRET=supersecret,RANDOM_STRING_SERVICE_URL=https://api.random.org/json-rpc/4/invoke
+          memory_size: 128
+          environment: DB_SOURCE=postgresql://postgres:arithmetic@arithmetic.cxvu8glh50sg.us-east-1.rds.amazonaws.com:5432/arithmetic,SECRET=supersecret,RANDOM_STRING_SERVICE_URL=https://api.random.org/json-rpc/4/invoke,RANDOM_STRING_SERVICE_API_KEY=ffcfa8ec-f661-44cf-86fc-1f08925f5880
