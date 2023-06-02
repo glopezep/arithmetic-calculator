@@ -25,6 +25,9 @@ func HandleWithContext(handler Handler) Handler {
 		ctx context.Context,
 		event events.APIGatewayProxyRequest,
 	) (*events.APIGatewayProxyResponse, error) {
+		if event.Headers["Authorization"] == "" {
+			return handler(ctx, event)
+		}
 
 		auth := event.Headers["Authorization"]
 		tokenString := strings.Split(auth, " ")[1]
