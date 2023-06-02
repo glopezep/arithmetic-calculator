@@ -1,4 +1,4 @@
-# arithmetic
+# arithmetic-backend
 
 This is a sample template for arithmetic - Below is a brief explanation of what we have generated for you:
 
@@ -43,7 +43,17 @@ make build
 make dev
 ```
 
-If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
+Alternative you can run the `start.sh` file witch create the db, run the migrations, build the project an run it in dev mode:
+
+```bash
+./start.sh
+```
+
+NOTE:
+
+You need to have postgres running, you can run it using `docker-compose up -f docker/docker-compose.yaml`
+
+If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/login`, `http://localhost:3000/users`, `http://localhost:3000/records`, `http://localhost:3000/operations`, `http://localhost:3000/user-info`
 
 **SAM CLI** is used to emulate both Lambda and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
 

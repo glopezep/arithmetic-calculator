@@ -1,4 +1,4 @@
-# Nuxt 3 Minimal Starter
+# arithmetic-frontend
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
@@ -19,7 +19,7 @@ pnpm install
 
 ## Development Server
 
-Start the development server on `http://localhost:3000`
+Start the development server on `http://localhost:3001`
 
 ```bash
 npm run dev
