@@ -4,7 +4,7 @@
 
 ## Infrastructure
 
-![Diagram](hhttps://github.com/glopezep/arithmetic-calculator/blob/main/Untitled%20Diagram.drawio.png?raw=true)
+![Diagram](https://raw.githubusercontent.com/glopezep/arithmetic-calculator/main/diagram.png)
 
 ## How to run
  The project is monorepo so you'll have to go to the specific of guides
