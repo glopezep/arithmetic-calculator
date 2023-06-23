@@ -16,7 +16,7 @@
 ## Stack
 - Fronted: Typescript, Node.js, Vue 3, Nuxt 3, Tailwind. This project is deployed in vercel for production.
 
-- Backend: Go, GORM. this project is based on lambda functions for production.
+- Backend: Go. this project is based on lambda functions for production.
 
 ## Architecture
 
@@ -31,12 +31,12 @@
 
 - The backend services are secured by JWT token.
 
-- The frontend  App sends a `Authorization: Bearer jwt-token` on each request in the server side, the session is stateless so the session is encrypted and store in the cookies and HTTP only
+- The frontend  App sends an `Authorization: Bearer jwt-token` on each request on the server side, the session is stateless so the session is encrypted and stored in the cookies and HTTP only
 
 ## Testing
 
-- Few Unit tests for demo in the domain layer, service layer and infrastructure layer
-- Few Integration tests for demo in interfaces layer
+- Few Unit tests for demo in the domain layer, service layer, and infrastructure layer
+- Few Integration tests for demo in the interfaces layer
 
 ## Resilient
 
